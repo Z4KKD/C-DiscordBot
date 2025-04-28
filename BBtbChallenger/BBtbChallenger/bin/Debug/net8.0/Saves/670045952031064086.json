@@ -1,14 +1,14 @@
 {
   "UserId": 670045952031064086,
   "Name": "z4kkd",
-  "Level": 4,
-  "Experience": 70,
-  "Health": 130,
+  "Level": 5,
+  "Experience": 40,
+  "Health": 140,
   "Attack": 10,
-  "Defense": 30,
-  "Mana": 10,
-  "MaxMana": 80,
-  "Coins": 189,
+  "Defense": 40,
+  "Mana": -30,
+  "MaxMana": 90,
+  "Coins": 238,
   "Inventory": [
     "potion",
     "potion",
@@ -17,7 +17,12 @@
     "potion",
     "potion",
     "potion",
-    "bronze shield"
+    "bronze shield",
+    "potion",
+    "potion",
+    "potion",
+    "potion",
+    "potion"
   ],
   "Weapon": null,
   "Armor": null,
@@ -29,9 +34,9 @@
   "HelmetBonus": 0,
   "ShieldBonus": 5,
   "IsAlive": true,
-  "MaxHealth": 130,
+  "MaxHealth": 140,
   "IsPowerUpActive": false,
   "MagicAbilities": [
-    "rock"
+    "fireball"
   ]
 }

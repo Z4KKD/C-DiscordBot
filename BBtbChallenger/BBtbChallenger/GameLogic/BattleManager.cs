@@ -11,7 +11,7 @@ namespace BBtbChallenger.GameLogic
     {
         public static Dictionary<ulong, BattleState> OngoingBattles = new();
 
-        public static async Task<string> StartFight(RpgCharacter character, Enemy enemy, ulong messageId, ulong channelId)
+        public static Task<string> StartFight(RpgCharacter character, Enemy enemy, ulong messageId, ulong channelId)
         {
             var sb = new StringBuilder();
             sb.AppendLine($"⚔️ **{character.Name}** engages **{enemy.Name}**!");
@@ -25,69 +25,116 @@ namespace BBtbChallenger.GameLogic
                 ChannelId = channelId
             };
 
-            sb.AppendLine("It's your turn! Type:\n`!action attack`\n`!action defend`\n`!action magic`");
+            sb.AppendLine("It's your turn! Type:\n`!a a (attack)`\n`!a d (defend)`\n`!a m (magic)`");
 
-            return sb.ToString();
+            return Task.FromResult(sb.ToString());
         }
 
-        public static async Task<string> ProcessAction(BattleState battle, string action)
+        public static Task<string> ProcessAction(BattleState battle, string action)
         {
             var character = battle.Character;
             var enemy = battle.Enemy;
             var sb = new StringBuilder();
 
             if (!battle.IsPlayerTurn)
-                return "It's not your turn yet!";
+                return Task.FromResult("It's not your turn yet!");
 
             int damage = 0;
 
             // Process action
             switch (action.ToLower())
             {
-                case "attack":
+                case "a":
                     damage = character.GetAttackDamage();
                     enemy.Health -= damage;
                     sb.AppendLine($"{character.Name} attacks {enemy.Name} for {damage} damage!");
                     break;
 
-                case "defend":
+                case "d":
                     sb.AppendLine(Defend(character));
                     break;
 
-                case "magic":
+                case "m":
+                    // Magic action
+                    string magicUsed = string.Empty;
                     if (character.MagicAbilities.Contains("rock"))
                     {
-                        sb.AppendLine(MagicManager.Spells["rock"].Item3(character, enemy));
-                        character.Mana -= 10; // Example mana usage for "rock" spell
+                        if (character.Mana >= 10)
+                        {
+                            sb.AppendLine(MagicManager.Spells["rock"].Item3(character, enemy));
+                            character.Mana -= 10;
+                            magicUsed = "rock";
+                        }
+                        else
+                        {
+                            sb.AppendLine("Not enough mana for 'rock' spell!");
+                        }
                     }
                     else if (character.MagicAbilities.Contains("fireball"))
                     {
-                        sb.AppendLine(MagicManager.Spells["fireball"].Item3(character, enemy));
-                        character.Mana -= 15; // Example mana usage for "fireball" spell
+                        if (character.Mana >= 15)
+                        {
+                            sb.AppendLine(MagicManager.Spells["fireball"].Item3(character, enemy));
+                            character.Mana -= 15;
+                            magicUsed = "fireball";
+                        }
+                        else
+                        {
+                            sb.AppendLine("Not enough mana for 'fireball' spell!");
+                        }
                     }
                     else if (character.MagicAbilities.Contains("stun"))
                     {
-                        sb.AppendLine(MagicManager.Spells["stun"].Item3(character, enemy));
-                        character.Mana -= 20; // Example mana usage for "stun" spell
+                        if (character.Mana >= 20)
+                        {
+                            sb.AppendLine(MagicManager.Spells["stun"].Item3(character, enemy));
+                            character.Mana -= 20;
+                            magicUsed = "stun";
+                        }
+                        else
+                        {
+                            sb.AppendLine("Not enough mana for 'stun' spell!");
+                        }
                     }
                     else if (character.MagicAbilities.Contains("powerup"))
                     {
-                        sb.AppendLine(MagicManager.Spells["powerup"].Item3(character, enemy));
-                        character.Mana -= 10; // Example mana usage for "powerup" spell
+                        if (character.Mana >= 10)
+                        {
+                            sb.AppendLine(MagicManager.Spells["powerup"].Item3(character, enemy));
+                            character.Mana -= 10;
+                            magicUsed = "powerup";
+                        }
+                        else
+                        {
+                            sb.AppendLine("Not enough mana for 'powerup' spell!");
+                        }
                     }
                     else if (character.MagicAbilities.Contains("stun_powerup"))
                     {
-                        sb.AppendLine(MagicManager.Spells["stun_powerup"].Item3(character, enemy));
-                        character.Mana -= 25; // Example mana usage for "stun_powerup" spell
+                        if (character.Mana >= 25)
+                        {
+                            sb.AppendLine(MagicManager.Spells["stun_powerup"].Item3(character, enemy));
+                            character.Mana -= 25;
+                            magicUsed = "stun_powerup";
+                        }
+                        else
+                        {
+                            sb.AppendLine("Not enough mana for 'stun_powerup' spell!");
+                        }
                     }
                     else
                     {
                         sb.AppendLine("You have no magic ability available!");
                     }
+
+                    if (!string.IsNullOrEmpty(magicUsed))
+                    {
+                        sb.AppendLine($"Used '{magicUsed}' spell.");
+                    }
                     break;
 
                 default:
-                    return "Invalid action. You can choose 'attack', 'defend', or 'magic'.";
+                    return Task.FromResult("Invalid action. You can choose 'a' (attack), 'd' (defend), or 'm' (magic).");
             }
 
             // Show updated HP and Mana for the player and HP for the enemy
@@ -109,7 +156,7 @@ namespace BBtbChallenger.GameLogic
                 }
                 SaveManager.SaveCharacter(character.UserId, character);
                 OngoingBattles.Remove(character.UserId);
-                return sb.ToString();
+                return Task.FromResult(sb.ToString());
             }
 
             // Enemy attacks
@@ -134,8 +181,9 @@ namespace BBtbChallenger.GameLogic
                 battle.IsPlayerTurn = true;
             }
 
-            return sb.ToString();
+            return Task.FromResult(sb.ToString());
         }
+
 
 
         public static string Defend(RpgCharacter character)
@@ -148,8 +196,8 @@ namespace BBtbChallenger.GameLogic
 
     public class BattleState
     {
-        public RpgCharacter Character { get; set; }
-        public Enemy Enemy { get; set; }
+        public required RpgCharacter Character { get; set; }
+        public required Enemy Enemy { get; set; }
         public bool IsPlayerTurn { get; set; }
         public ulong BattleMessageId { get; set; }
         public ulong ChannelId { get; set; }

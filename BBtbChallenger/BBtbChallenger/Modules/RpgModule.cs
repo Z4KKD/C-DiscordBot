@@ -79,7 +79,7 @@ namespace BBtbChallenger.Modules
             await placeholderMessage.ModifyAsync(msg => msg.Content = fightText);
         }
 
-        [Command("action")]
+        [Command("a")]
         public async Task ActionCommand(string action)
         {
             if (!BattleManager.OngoingBattles.TryGetValue(Context.User.Id, out var battle))
@@ -137,7 +137,7 @@ namespace BBtbChallenger.Modules
         }
 
         [Command("buy")]
-        public async Task BuyItem(string itemName)
+        public async Task BuyItem(params string[] itemNameParts)
         {
             if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
             {
@@ -145,7 +145,15 @@ namespace BBtbChallenger.Modules
                 return;
             }
 
-            itemName = itemName.ToLowerInvariant();
+            if (itemNameParts.Length == 0)
+            {
+                await ReplyAsync("Please specify an item to buy. Example: `!buy bronze shield`");
+                return;
+            }
+
+            // Join the item name parts into a single string
+            string itemName = string.Join(" ", itemNameParts).ToLowerInvariant();
+
             if (!shopItems.TryGetValue(itemName, out var itemInfo))
             {
                 await ReplyAsync("That item doesn't exist in the shop.");
@@ -158,11 +166,13 @@ namespace BBtbChallenger.Modules
                 return;
             }
 
+            // Deduct coins and add the item to inventory
             character.Coins -= itemInfo.Price;
             character.Inventory.Add(itemName);
             SaveManager.SaveCharacter(Context.User.Id, character);
             await ReplyAsync($"✅ You bought a **{itemName}**! It’s now in your inventory.");
         }
+
 
         [Command("inventory")]
         public async Task ShowInventory()
@@ -188,6 +198,64 @@ namespace BBtbChallenger.Modules
 
             await ReplyAsync(sb.ToString());
         }
+
+        [Command("help")]
+        public async Task ShowHelp()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("📖 **RPG Commands Help**");
+            sb.AppendLine("`!start` - Begin your adventure.");
+            sb.AppendLine("`!stats` - View your character's stats.");
+            sb.AppendLine("`!fight` - Fight a random enemy.");
+            sb.AppendLine("`!a [a|d|m]` - Perform an action in battle. Type `!a a` for attack, `!a d` for defend, `!a m` for magic.");
+            sb.AppendLine("`!use [item]` - Use an item from your inventory.");
+            sb.AppendLine("`!shop` - View items available in the shop.");
+            sb.AppendLine("`!buy [item]` - Buy an item from the shop. Example: `!buy bronze shield`.");
+            sb.AppendLine("`!sell [item]` - Sell an item from your inventory.");
+            sb.AppendLine("`!inventory` - Check your inventory.");
+            sb.AppendLine("`!equip [sword|shield|armor|helmet]` - Equip your best gear.");
+            sb.AppendLine("`!help` - Show this help menu.");
+
+            await ReplyAsync(sb.ToString());
+        }
+
+
+        [Command("sell")]
+        public async Task SellItem(params string[] itemNameParts)
+        {
+            if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
+            {
+                await ReplyAsync("You haven't started yet. Use `!start` to begin your adventure.");
+                return;
+            }
+
+            if (itemNameParts.Length == 0)
+            {
+                await ReplyAsync("Please specify an item to sell. Example: `!sell bronze shield`");
+                return;
+            }
+
+            string itemName = string.Join(" ", itemNameParts).ToLowerInvariant();
+
+            // Check if they have the item
+            var inventoryItem = character.Inventory.FirstOrDefault(i => i.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+            if (inventoryItem == null)
+            {
+                await ReplyAsync("You don't have that item in your inventory.");
+                return;
+            }
+
+            // Calculate sell price (half of shop price if exists, otherwise a default)
+            int sellPrice = shopItems.TryGetValue(itemName, out var itemInfo) ? itemInfo.Price / 2 : 10;
+
+            // Remove the item and add coins
+            character.Inventory.Remove(inventoryItem);
+            character.Coins += sellPrice;
+
+            SaveManager.SaveCharacter(Context.User.Id, character);
+            await ReplyAsync($"💰 You sold **{itemName}** for **{sellPrice} coins**!");
+        }
+
 
         [Command("equip")]
         public async Task EquipItem(string type)
@@ -332,7 +400,9 @@ namespace BBtbChallenger.Modules
 
         private bool TryLoadCharacter(ulong userId, string username, out RpgCharacter character)
         {
-            if (!characters.TryGetValue(userId, out character))
+            character = null!; // prevent warning
+
+            if (!characters.TryGetValue(userId, out var foundCharacter))
             {
                 var loaded = SaveManager.LoadCharacter(userId);
                 if (loaded != null)
@@ -341,6 +411,11 @@ namespace BBtbChallenger.Modules
                     character = loaded;
                 }
             }
+            else
+            {
+                character = foundCharacter;
+            }
+
             return character != null;
         }
 

@@ -60,8 +60,14 @@ namespace BBtbChallenger
             var context = new SocketCommandContext(_client, message);
             try
             {
-                // Ensure the command execution doesn't block the event loop
-                await _commands.ExecuteAsync(context, argPos, _services);
+                if (_commands != null)
+                {
+                    await _commands.ExecuteAsync(context, argPos, _services);
+                }
+                else
+                {
+                    Console.WriteLine("Warning: Commands service is not initialized.");
+                }
             }
             catch (Exception ex)
             {

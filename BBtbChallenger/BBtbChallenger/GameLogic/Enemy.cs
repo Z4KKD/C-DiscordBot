@@ -220,16 +220,27 @@ namespace BBtbChallenger.GameLogic
         {
             List<Drop> drops = new List<Drop>();
 
+            // Define a multiplier to increase all chances (e.g., 1.5x the original chance)
+            float chanceMultiplier = 3f;
+
             foreach (var drop in possibleDrops)
             {
-                if (_random.Next(100) < drop.Chance) // Roll for each item drop
+                // Increase the chance by the multiplier
+                int adjustedChance = (int)(drop.Chance * chanceMultiplier);
+
+                // Make sure the chance doesn't exceed 100
+                adjustedChance = Math.Min(adjustedChance, 100);
+
+                // Roll for each item drop
+                if (_random.Next(100) < adjustedChance)
                 {
-                    drops.Add(drop); // Add to the loot if it passes the chance
+                    drops.Add(drop); // Add to the loot if it passes the adjusted chance
                 }
             }
 
             return drops;
         }
+
     }
 
 }
