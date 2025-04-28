@@ -33,7 +33,9 @@ namespace BBtbChallenger.Data
             if (!File.Exists(path)) return null!;
 
             var json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<RpgCharacter>(json)!;
+            var character = JsonSerializer.Deserialize<RpgCharacter>(json)!;
+            character.UserId = userId;
+            return character;
         }
 
         private static string GetPath(ulong userId)

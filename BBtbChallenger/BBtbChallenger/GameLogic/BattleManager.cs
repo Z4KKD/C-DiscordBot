@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using BBtbChallenger.Data;
+using Discord;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -76,7 +77,7 @@ namespace BBtbChallenger.GameLogic
                     character.Inventory.Add(loot.Item);
                     sb.AppendLine($"You found a **{loot.Item}**!");
                 }
-
+                SaveManager.SaveCharacter(character.UserId, character);
                 OngoingBattles.Remove(character.UserId);
                 return sb.ToString();
             }
@@ -91,6 +92,7 @@ namespace BBtbChallenger.GameLogic
             {
                 character.Die();
                 sb.AppendLine("You were defeated... 😵 Use `!start` to revive.");
+                SaveManager.SaveCharacter(character.UserId, character);
                 OngoingBattles.Remove(character.UserId);
             }
             else
