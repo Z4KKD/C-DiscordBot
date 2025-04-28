@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BBtbChallenger")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+613611e2d9191dda37aae943f6c345b87af4e09f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc81a769c6351ba9f29cd7aad1711f29cc5aae8b")]
 [assembly: System.Reflection.AssemblyProductAttribute("BBtbChallenger")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BBtbChallenger")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -24,15 +24,34 @@
 
     public bool IsAlive => Health > 0;
     public int MaxHealth => 100 + (Level - 1) * 10;
-    public bool HasTwoHandedWeapon => Weapon?.ToLower() == "greatsword";
     public bool IsPowerUpActive { get; set; } = false;
-    public bool HasMagicAbility => Level >= 5;
 
     // Add UserId to associate character with Discord user
     public RpgCharacter(ulong userId, string name)
     {
         UserId = userId;
         Name = name;
+    }
+    public List<string> MagicAbilities
+    {
+        get
+        {
+            List<string> abilities = new List<string>();
+
+            if (Level < 5) abilities.Add("rock");
+
+            if (Level >= 5 && Level < 10) abilities.Add("fireball");
+
+            if (Level >= 10 && Level < 15) abilities.Add("stun");
+
+            if (Level >= 15 && Level < 20)
+            {
+                abilities.Add("stun");
+                abilities.Add("powerup");
+            }
+
+            return abilities;
+        }
     }
 
     public void GainExperience(int amount)
@@ -60,8 +79,6 @@
 
     public void EquipShield(string shield, int bonus)
     {
-        if (HasTwoHandedWeapon)
-            throw new InvalidOperationException("You can't equip a shield while using a two-handed weapon.");
 
         if (Shield != null) UnequipShield();
 

@@ -41,6 +41,7 @@ namespace BBtbChallenger.GameLogic
 
             int damage = 0;
 
+            // Process action
             switch (action.ToLower())
             {
                 case "attack":
@@ -54,15 +55,44 @@ namespace BBtbChallenger.GameLogic
                     break;
 
                 case "magic":
-                    if (MagicManager.Spells.ContainsKey("Fireball"))
-                        sb.AppendLine(MagicManager.Spells["Fireball"].Item3(character, enemy));
+                    if (character.MagicAbilities.Contains("rock"))
+                    {
+                        sb.AppendLine(MagicManager.Spells["rock"].Item3(character, enemy));
+                        character.Mana -= 10; // Example mana usage for "rock" spell
+                    }
+                    else if (character.MagicAbilities.Contains("fireball"))
+                    {
+                        sb.AppendLine(MagicManager.Spells["fireball"].Item3(character, enemy));
+                        character.Mana -= 15; // Example mana usage for "fireball" spell
+                    }
+                    else if (character.MagicAbilities.Contains("stun"))
+                    {
+                        sb.AppendLine(MagicManager.Spells["stun"].Item3(character, enemy));
+                        character.Mana -= 20; // Example mana usage for "stun" spell
+                    }
+                    else if (character.MagicAbilities.Contains("powerup"))
+                    {
+                        sb.AppendLine(MagicManager.Spells["powerup"].Item3(character, enemy));
+                        character.Mana -= 10; // Example mana usage for "powerup" spell
+                    }
+                    else if (character.MagicAbilities.Contains("stun_powerup"))
+                    {
+                        sb.AppendLine(MagicManager.Spells["stun_powerup"].Item3(character, enemy));
+                        character.Mana -= 25; // Example mana usage for "stun_powerup" spell
+                    }
                     else
-                        sb.AppendLine("You have no magic ability!");
+                    {
+                        sb.AppendLine("You have no magic ability available!");
+                    }
                     break;
 
                 default:
                     return "Invalid action. You can choose 'attack', 'defend', or 'magic'.";
             }
+
+            // Show updated HP and Mana for the player and HP for the enemy
+            sb.AppendLine($"\nCurrent Stats: HP: {character.Health}/{character.MaxHealth} | Mana: {character.Mana}/{character.MaxMana}");
+            sb.AppendLine($"**{enemy.Name}** HP: {enemy.Health}/{enemy.MaxHealth}");
 
             // Check if enemy defeated
             if (!enemy.IsAlive)
@@ -88,6 +118,10 @@ namespace BBtbChallenger.GameLogic
             character.Health -= enemyDamage;
             sb.AppendLine($"{enemy.Name} strikes you for {enemyDamage} damage!");
 
+            // Show current stats after enemy attack
+            sb.AppendLine($"\nCurrent Stats: HP: {character.Health}/{character.MaxHealth} | Mana: {character.Mana}/{character.MaxMana}");
+            sb.AppendLine($"**{enemy.Name}** HP: {enemy.Health}/{enemy.MaxHealth}");
+
             if (!character.IsAlive)
             {
                 character.Die();
@@ -102,6 +136,7 @@ namespace BBtbChallenger.GameLogic
 
             return sb.ToString();
         }
+
 
         public static string Defend(RpgCharacter character)
         {

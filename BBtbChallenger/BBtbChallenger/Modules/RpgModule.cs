@@ -16,10 +16,13 @@ namespace BBtbChallenger.Modules
     {
         private static ConcurrentDictionary<ulong, RpgCharacter> characters = new();
         private static readonly Dictionary<string, (string Description, int Price)> shopItems = new()
-        {
-            { "potion", ("Restores 30 HP", 25) },
-            { "elixir", ("Fully restores health", 60) },
-        };
+    {
+        { "potion", ("Restores 30 HP", 25) },
+        { "elixir", ("Fully restores health", 75) },
+        { "small mana potion", ("Restores 30 Mana", 25) },  
+        { "large mana potion", ("Restores 70 Mana", 50) }  
+    };
+
 
         [Command("start")]
         public async Task StartRpg()
@@ -50,10 +53,12 @@ namespace BBtbChallenger.Modules
 
             await ReplyAsync($"**{character.Name}** - Level {character.Level}\n" +
                              $"HP: {character.Health}/{character.MaxHealth}\n" +
+                             $"Mana: {character.Mana}/{character.MaxMana}\n" + // Added Mana to stats
                              $"Attack: {character.Attack} | Defense: {character.Defense}\n" +
                              $"XP: {character.Experience}/{character.ExperienceToNextLevel()}\n" +
                              $"💰 Coins: {character.Coins}");
         }
+
 
         [Command("fight")]
         public async Task StartFightCommand()
@@ -63,7 +68,7 @@ namespace BBtbChallenger.Modules
                 await ReplyAsync("You haven't started yet. Use `!start` to begin your adventure.");
                 return;
             }
-
+            character.UserId = Context.User.Id;
             var enemies = EnemyFactory.GetEnemiesForLevel(character.Level);
             var random = new Random();
             var randomEnemy = enemies[random.Next(enemies.Count)];
@@ -108,12 +113,15 @@ namespace BBtbChallenger.Modules
             {
                 "potion" => UsePotion(character),
                 "elixir" => UseElixir(character),
+                "mana potion" => UseManaPotion(character),
+                "mana elixir" => UseManaElixir(character),
                 _ => "That item can't be used or isn't recognized."
             };
 
             SaveManager.SaveCharacter(Context.User.Id, character);
             await ReplyAsync(response);
         }
+
 
         [Command("shop")]
         public async Task ShowShop()
@@ -181,6 +189,145 @@ namespace BBtbChallenger.Modules
             await ReplyAsync(sb.ToString());
         }
 
+        [Command("equip")]
+        public async Task EquipItem(string type)
+        {
+            if (!characters.TryGetValue(Context.User.Id, out var character))
+            {
+                await ReplyAsync("You need to start your adventure first with `!start`.");
+                return;
+            }
+
+            type = type.ToLower();
+
+            // Define item strength ranking
+                    Dictionary<string, int> weaponPower = new()
+            {
+                { "bronze sword", 5 }, { "iron sword", 10 }, { "steel sword", 15 },
+                { "silver sword", 20 }, { "gold sword", 25 }, { "mithril sword", 30 },
+                { "adamantite sword", 35 }, { "platinum sword", 40 }
+            };
+
+                    Dictionary<string, int> armorPower = new()
+            {
+                { "iron armor", 10 }, { "steel armor", 15 }, { "silver armor", 20 },
+                { "gold armor", 25 }, { "mithril armor", 30 }, { "adamantite armor", 35 },
+                { "platinum armor", 40 }
+            };
+
+                    Dictionary<string, int> shieldPower = new()
+            {
+                { "bronze shield", 5 }, { "iron shield", 10 }, { "steel shield", 15 },
+                { "silver shield", 20 }, { "gold shield", 25 }, { "mithril shield", 30 },
+                { "adamantite shield", 35 }, { "platinum shield", 40 }
+            };
+
+                    Dictionary<string, int> helmetPower = new()
+            {
+                { "bronze helmet", 5 }, { "iron helmet", 10 }, { "steel helmet", 15 },
+                { "gold helmet", 20 }
+            };
+
+            string? bestItem = null;
+            int bestBonus = 0;
+
+            if (type == "sword")
+            {
+                foreach (var item in character.Inventory)
+                {
+                    if (weaponPower.TryGetValue(item.ToLower(), out var bonus) && bonus > bestBonus)
+                    {
+                        bestItem = item;
+                        bestBonus = bonus;
+                    }
+                }
+
+                if (bestItem != null)
+                {
+                    if (character.Weapon != null) character.UnequipWeapon();
+                    character.EquipWeapon(bestItem, bestBonus, isTwoHanded: false);
+                    await ReplyAsync($"You equipped **{bestItem}** (+{bestBonus} Attack)!");
+                }
+                else
+                {
+                    await ReplyAsync("You don't have a sword to equip.");
+                }
+            }
+            else if (type == "shield")
+            {
+                foreach (var item in character.Inventory)
+                {
+                    if (shieldPower.TryGetValue(item.ToLower(), out var bonus) && bonus > bestBonus)
+                    {
+                        bestItem = item;
+                        bestBonus = bonus;
+                    }
+                }
+
+                if (bestItem != null)
+                {
+                    if (character.Shield != null) character.UnequipShield();
+                    character.EquipShield(bestItem, bestBonus);
+                    await ReplyAsync($"You equipped **{bestItem}** (+{bestBonus} Defense)!");
+                }
+                else
+                {
+                    await ReplyAsync("You don't have a shield to equip.");
+                }
+            }
+            else if (type == "armor")
+            {
+                foreach (var item in character.Inventory)
+                {
+                    if (armorPower.TryGetValue(item.ToLower(), out var bonus) && bonus > bestBonus)
+                    {
+                        bestItem = item;
+                        bestBonus = bonus;
+                    }
+                }
+
+                if (bestItem != null)
+                {
+                    if (character.Armor != null) character.UnequipArmor();
+                    character.EquipArmor(bestItem, bestBonus);
+                    await ReplyAsync($"You equipped **{bestItem}** (+{bestBonus} Defense)!");
+                }
+                else
+                {
+                    await ReplyAsync("You don't have armor to equip.");
+                }
+            }
+            else if (type == "helmet")
+            {
+                foreach (var item in character.Inventory)
+                {
+                    if (helmetPower.TryGetValue(item.ToLower(), out var bonus) && bonus > bestBonus)
+                    {
+                        bestItem = item;
+                        bestBonus = bonus;
+                    }
+                }
+
+                if (bestItem != null)
+                {
+                    if (character.Helmet != null) character.UnequipHelmet();
+                    character.EquipHelmet(bestItem, bestBonus);
+                    await ReplyAsync($"You equipped **{bestItem}** (+{bestBonus} Defense)!");
+                }
+                else
+                {
+                    await ReplyAsync("You don't have a helmet to equip.");
+                }
+            }
+            else
+            {
+                await ReplyAsync("Please specify a valid item type: `sword`, `shield`, `armor`, or `helmet`.");
+            }
+
+            SaveManager.SaveCharacter(Context.User.Id, character);
+        }
+
+
         // --- Private helper methods below ---
 
         private bool TryLoadCharacter(ulong userId, string username, out RpgCharacter character)
@@ -216,5 +363,26 @@ namespace BBtbChallenger.Modules
             character.Inventory.Remove("elixir");
             return $"{character.Name} used an Elixir and fully restored their HP! ✨";
         }
+
+        private static string UseManaPotion(RpgCharacter character)
+        {
+            if (character.Mana == character.MaxMana)
+                return "Your mana is already full.";
+
+            character.Mana = Math.Min(character.Mana + 30, character.MaxMana);
+            character.Inventory.Remove("mana potion");
+            return $"{character.Name} used a Mana Potion and restored 30 Mana! 🔵";
+        }
+
+        private static string UseManaElixir(RpgCharacter character)
+        {
+            if (character.Mana == character.MaxMana)
+                return "Your mana is already full.";
+
+            character.Mana = character.MaxMana;
+            character.Inventory.Remove("mana elixir");
+            return $"{character.Name} used a Mana Elixir and fully restored their Mana! ✨🔵";
+        }
+
     }
 }

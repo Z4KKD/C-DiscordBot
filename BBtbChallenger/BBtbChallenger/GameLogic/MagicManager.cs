@@ -1,66 +1,79 @@
 ﻿using BBtbChallenger.GameLogic;
-using System;
-using System.Collections.Generic;
 
-namespace BBtbChallenger.GameLogic
+public static class MagicManager
 {
-    public static class MagicManager
+    public static readonly Dictionary<string, (string Description, int ManaCost, Func<RpgCharacter, Enemy, string>)> Spells = new()
     {
-        public static readonly Dictionary<string, (string Description, int ManaCost, Func<RpgCharacter, Enemy, string>)> Spells = new()
         {
-            {
-                "fireball",
-                (
-                    "Deals 30 damage to an enemy",
-                    20,
-                    (RpgCharacter character, Enemy enemy) =>
+            "rock",
+            (
+                "Deals 15 damage to an enemy",
+                10,
+                (RpgCharacter character, Enemy enemy) =>
+                {
+                    if (character.Mana >= 10)
                     {
-                        if (character.Mana >= 20)
-                        {
-                            character.Mana -= 20;
-                            enemy.Health -= 30;
-                            return $"{character.Name} casts Fireball! It deals 30 damage to {enemy.Name}.";
-                        }
-                        return "Not enough mana to cast Fireball.";
+                        character.Mana -= 10;
+                        enemy.Health -= 15;
+                        return $"{character.Name} casts Rock! It deals 15 damage to {enemy.Name}.";
                     }
-                )
-            },
+                    return "Not enough mana to cast Rock.";
+                }
+            )
+        },
 
-            {
-                "stun",
-                (
-                    "Stuns an enemy for one turn",
-                    15,
-                    (RpgCharacter character, Enemy enemy) =>
+        {
+            "fireball",
+            (
+                "Deals 30 damage to an enemy",
+                20,
+                (RpgCharacter character, Enemy enemy) =>
+                {
+                    if (character.Mana >= 20)
                     {
-                        if (character.Mana >= 15)
-                        {
-                            character.Mana -= 15;
-                            enemy.IsStunned = true;  // Assuming Enemy has an `IsStunned` property
-                            return $"{character.Name} casts Stun! {enemy.Name} is stunned and cannot act this turn.";
-                        }
-                        return "Not enough mana to cast Stun.";
+                        character.Mana -= 20;
+                        enemy.Health -= 30;
+                        return $"{character.Name} casts Fireball! It deals 30 damage to {enemy.Name}.";
                     }
-                )
-            },
+                    return "Not enough mana to cast Fireball.";
+                }
+            )
+        },
 
-            {
-                "powerup",
-                (
-                    "Doubles the player's attack damage for the next turn",
-                    25,
-                    (RpgCharacter character, Enemy enemy) =>
+        {
+            "stun",
+            (
+                "Stuns an enemy for one turn",
+                15,
+                (RpgCharacter character, Enemy enemy) =>
+                {
+                    if (character.Mana >= 15)
                     {
-                        if (character.Mana >= 25)
-                        {
-                            character.Mana -= 25;
-                            character.IsPowerUpActive = true;  // Assuming RpgCharacter has this property
-                            return $"{character.Name} casts Power Up! Your attack damage is doubled for the next turn.";
-                        }
-                        return "Not enough mana to cast Power Up.";
+                        character.Mana -= 15;
+                        enemy.IsStunned = true;
+                        return $"{character.Name} casts Stun! {enemy.Name} is stunned and cannot act this turn.";
                     }
-                )
-            },
-        };
-    }
+                    return "Not enough mana to cast Stun.";
+                }
+            )
+        },
+
+        {
+            "powerup",
+            (
+                "Doubles the player's attack damage for the next turn",
+                25,
+                (RpgCharacter character, Enemy enemy) =>
+                {
+                    if (character.Mana >= 25)
+                    {
+                        character.Mana -= 25;
+                        character.IsPowerUpActive = true;
+                        return $"{character.Name} casts Power Up! Your attack damage is doubled for the next turn.";
+                    }
+                    return "Not enough mana to cast Power Up.";
+                }
+            )
+        },
+    };
 }
