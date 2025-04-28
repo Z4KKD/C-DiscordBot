@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "/Z/ylQKFeJk=",
+  "dgSpecHash": "HPokCXzS5D4=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Zdunc\\source\\repos\\BBtbChallenger\\BBtbChallenger\\BBtbChallenger.csproj",
+  "projectFilePath": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\BBtbChallenger.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Zdunc\\.nuget\\packages\\discord.net\\3.17.2\\discord.net.3.17.2.nupkg.sha512",
     "C:\\Users\\Zdunc\\.nuget\\packages\\discord.net.commands\\3.17.2\\discord.net.commands.3.17.2.nupkg.sha512",

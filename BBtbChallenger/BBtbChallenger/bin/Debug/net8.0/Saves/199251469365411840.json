@@ -1,0 +1,22 @@
+{
+  "Name": "shutout",
+  "Level": 1,
+  "Experience": 90,
+  "Health": 100,
+  "Attack": 10,
+  "Defense": 5,
+  "Coins": 116,
+  "Inventory": [],
+  "Weapon": null,
+  "Armor": null,
+  "Helmet": null,
+  "Shield": null,
+  "LastDeathTime": "0001-01-01T00:00:00",
+  "WeaponBonus": 0,
+  "ArmorBonus": 0,
+  "HelmetBonus": 0,
+  "ShieldBonus": 0,
+  "IsAlive": true,
+  "MaxHealth": 100,
+  "HasTwoHandedWeapon": false
+}

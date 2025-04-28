@@ -1,31 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BBtbChallenger.GameLogic;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace BBtbChallenger
 {
-    using Discord;
-    using Discord.Commands;
-    using Discord.WebSocket;
-    using Microsoft.Extensions.DependencyInjection;
-    using System.Reflection;
-
     class Program
     {
-        private DiscordSocketClient _client;
-        private CommandService _commands;
-        private IServiceProvider _services;
+        private DiscordSocketClient? _client; // Removed nullable
+        private CommandService? _commands; // Removed nullable
+        private IServiceProvider? _services;
 
         static Task Main(string[] args) => new Program().MainAsync();
 
-        public async Task MainAsync()
+        private async Task MainAsync()
         {
             _client = new DiscordSocketClient(new DiscordSocketConfig
             {
-                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+                GatewayIntents = GatewayIntents.AllUnprivileged |
+                     GatewayIntents.MessageContent |
+                     GatewayIntents.GuildMessageReactions |
+                     GatewayIntents.DirectMessageReactions
             });
+
 
             _commands = new CommandService();
             _services = ConfigureServices();
@@ -40,9 +39,8 @@ namespace BBtbChallenger
             };
 
             _client.MessageReceived += HandleCommandAsync;
-            _client.ButtonExecuted += BlackjackModule.HandleButton;
 
-            var token = "//"; // Replace with your bot token
+            var token = "MTM0MzY4NTk3NjMyMDYzODk3Ng.G3FVUZ.nY8QTKRTxd34zezx3fsxOFOFI44IRkcFsYauTo"; // Replace with your bot token
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
@@ -50,14 +48,6 @@ namespace BBtbChallenger
 
             // Keep the program alive
             await Task.Delay(-1);
-        }
-
-        private IServiceProvider ConfigureServices()
-        {
-            return new ServiceCollection()
-                .AddSingleton(_client)
-                .AddSingleton(_commands)
-                .BuildServiceProvider();
         }
 
         private async Task HandleCommandAsync(SocketMessage messageParam)
@@ -68,15 +58,31 @@ namespace BBtbChallenger
             if (!message.HasCharPrefix('!', ref argPos)) return;
 
             var context = new SocketCommandContext(_client, message);
-
-            await _commands.ExecuteAsync(context, argPos, _services);
+            try
+            {
+                // Ensure the command execution doesn't block the event loop
+                await _commands.ExecuteAsync(context, argPos, _services);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error executing command: {ex.Message}");
+            }
         }
 
         private Task Log(LogMessage msg)
         {
-            Console.WriteLine(msg.ToString());
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"[{msg.Severity}] {msg.Source}: {msg.Message}");
+            Console.ResetColor();
             return Task.CompletedTask;
         }
-    }
 
+        private IServiceProvider ConfigureServices()
+        {
+            return new ServiceCollection()
+                .AddSingleton(_client!)
+                .AddSingleton(_commands!)
+                .BuildServiceProvider();
+        }
+    }
 }

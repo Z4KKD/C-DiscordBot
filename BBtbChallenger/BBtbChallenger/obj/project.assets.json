@@ -704,11 +704,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Zdunc\\source\\repos\\BBtbChallenger\\BBtbChallenger\\BBtbChallenger.csproj",
+      "projectUniqueName": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\BBtbChallenger.csproj",
       "projectName": "BBtbChallenger",
-      "projectPath": "C:\\Users\\Zdunc\\source\\repos\\BBtbChallenger\\BBtbChallenger\\BBtbChallenger.csproj",
+      "projectPath": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\BBtbChallenger.csproj",
       "packagesPath": "C:\\Users\\Zdunc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Zdunc\\source\\repos\\BBtbChallenger\\BBtbChallenger\\obj\\",
+      "outputPath": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -773,7 +773,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
