@@ -16,12 +16,36 @@ namespace BBtbChallenger.Modules
     {
         private static ConcurrentDictionary<ulong, RpgCharacter> characters = new();
         private static readonly Dictionary<string, (string Description, int Price)> shopItems = new()
-    {
-        { "potion", ("Restores 30 HP", 25) },
-        { "elixir", ("Fully restores health", 75) },
-        { "small mana potion", ("Restores 30 Mana", 25) },  
-        { "large mana potion", ("Restores 70 Mana", 50) }  
-    };
+        {
+            // Potions
+            { "potion", ("Restores 30 HP", 35) },
+            { "elixir", ("Fully restores health", 100) },
+            { "small mana potion", ("Restores 30 Mana", 30) },
+            { "large mana potion", ("Restores 70 Mana", 70) },
+
+            // Bronze gear
+            { "bronze sword", ("A basic bronze sword.", 90) },
+            { "bronze shield", ("A basic bronze shield. ", 75) },
+            { "bronze helmet", ("A simple bronze helmet.", 60) },
+
+            // Iron gear
+            { "iron sword", ("A sturdy iron sword. ", 180) },
+            { "iron shield", ("A sturdy iron shield. ", 150) },
+            { "iron helmet", ("A strong iron helmet. ", 130) },
+            { "iron armor", ("Protective iron armor. ", 220) },
+
+            // Steel gear
+            { "steel sword", ("A sharp steel sword. ", 300) },
+            { "steel shield", ("A heavy steel shield. ", 250) },
+            { "steel helmet", ("A durable steel helmet. ", 220) },
+            { "steel armor", ("Solid steel armor. ", 400) },
+
+            // Silver gear
+            { "silver sword", ("A refined silver sword.", 450) },
+            { "silver shield", ("A polished silver shield.", 380) },
+            { "silver armor", ("Shining silver armor.", 600) }
+        };
+
 
 
         [Command("start")]
@@ -103,7 +127,7 @@ namespace BBtbChallenger.Modules
 
             if (itemNameParts.Length == 0)
             {
-                await ReplyAsync("Please specify an item to use. Example: `!use health potion`");
+                await ReplyAsync("Please specify an item to use. Example: `!use potion`");
                 return;
             }
 
@@ -117,20 +141,45 @@ namespace BBtbChallenger.Modules
                 return;
             }
 
-            // Handle item usage (example for health potion)
-            if (inventoryItem == "health potion")
+            bool used = false;
+
+            switch (inventoryItem)
             {
-                character.Health = Math.Min(character.MaxHealth, character.Health + 50); // Heal the player
+                case "potion":
+                    character.Health = Math.Min(character.MaxHealth, character.Health + 30);
+                    used = true;
+                    await ReplyAsync($"🧪 You used a **Potion** and restored **30 HP**!");
+                    break;
+
+                case "elixir":
+                    character.Health = character.MaxHealth;
+                    used = true;
+                    await ReplyAsync($"✨ You used an **Elixir** and fully restored your **Health**!");
+                    break;
+
+                case "small mana potion":
+                    character.Mana = Math.Min(character.MaxMana, character.Mana + 30);
+                    used = true;
+                    await ReplyAsync($"🔵 You used a **Small Mana Potion** and restored **30 Mana**!");
+                    break;
+
+                case "large mana potion":
+                    character.Mana = Math.Min(character.MaxMana, character.Mana + 70);
+                    used = true;
+                    await ReplyAsync($"🔵 You used a **Large Mana Potion** and restored **70 Mana**!");
+                    break;
+
+                default:
+                    await ReplyAsync($"❓ You can't use the **{itemName}** right now.");
+                    return;
+            }
+
+            if (used)
+            {
                 character.Inventory.Remove(inventoryItem);
                 SaveManager.SaveCharacter(Context.User.Id, character);
-                await ReplyAsync($"You used a **{itemName}** and healed 50 health!");
-            }
-            else
-            {
-                await ReplyAsync($"You can't use the **{itemName}** right now.");
             }
         }
-
 
 
         [Command("shop")]
