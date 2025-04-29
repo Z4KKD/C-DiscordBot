@@ -326,7 +326,7 @@ namespace BBtbChallenger.Modules
             sb.AppendLine("📖 **RPG Commands Guide**");
             sb.AppendLine();
             sb.AppendLine("__**Character Commands:**__");
-            sb.AppendLine("`!start` - Begin your adventure.");
+            sb.AppendLine("`!start` - Begin your adventure / revive.");
             sb.AppendLine("`!stats` - View your character's stats.");
             sb.AppendLine("`!inventory` - Check your inventory.");
             sb.AppendLine("`!equip [sword|shield|armor|helmet]` - Equip your best gear automatically.");
