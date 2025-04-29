@@ -38,21 +38,15 @@
         {
             List<string> abilities = new List<string>();
 
-            if (Level < 5) abilities.Add("rock");
-
-            if (Level >= 5 && Level < 10) abilities.Add("fireball");
-
-            if (Level >= 10 && Level < 15) abilities.Add("stun");
-
-            if (Level >= 15 && Level < 20)
-            {
-                abilities.Add("stun");
-                abilities.Add("powerup");
-            }
+            if (Level >= 0) abilities.Add("rock");
+            if (Level >= 5) abilities.Add("fireball");
+            if (Level >= 10) abilities.Add("stun");
+            if (Level >= 15) abilities.Add("powerup");
 
             return abilities;
         }
     }
+
 
     public void GainExperience(int amount)
     {
@@ -62,6 +56,9 @@
             Experience -= ExperienceToNextLevel();
             Level++;
             Health = MaxHealth;
+            Mana = MaxMana;
+            Attack += 1;
+            Defense += 1;
         }
     }
 
@@ -133,24 +130,23 @@
         HelmetBonus = 0;
     }
 
-    public bool CanRevive()
-    {
-        if (!IsAlive && DateTime.UtcNow >= LastDeathTime.AddMinutes(5))
-        {
-            Health = MaxHealth;
-            return true;
-        }
-        return false;
-    }
-
     public int GetAttackDamage()
     {
-        return Attack + WeaponBonus;
+        int totalAttack = Attack + WeaponBonus;
+
+        if (IsPowerUpActive)
+        {
+            totalAttack *= 2;
+            IsPowerUpActive = false; 
+        }
+
+        return totalAttack;
     }
 
     public void Die()
     {
-        Health = 0;
+        Health = MaxHealth;
+        Mana = MaxMana;
         LastDeathTime = DateTime.UtcNow;
     }
 }

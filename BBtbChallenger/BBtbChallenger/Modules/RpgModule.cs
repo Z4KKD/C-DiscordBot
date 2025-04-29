@@ -93,7 +93,7 @@ namespace BBtbChallenger.Modules
         }
 
         [Command("use")]
-        public async Task UseItem(string item)
+        public async Task UseItem(params string[] itemNameParts)
         {
             if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
             {
@@ -101,26 +101,36 @@ namespace BBtbChallenger.Modules
                 return;
             }
 
-            item = item.ToLowerInvariant();
-
-            if (!character.Inventory.Any(i => i.Equals(item, StringComparison.OrdinalIgnoreCase)))
+            if (itemNameParts.Length == 0)
             {
-                await ReplyAsync("You don't have that item.");
+                await ReplyAsync("Please specify an item to use. Example: `!use health potion`");
                 return;
             }
 
-            string response = item switch
-            {
-                "potion" => UsePotion(character),
-                "elixir" => UseElixir(character),
-                "mana potion" => UseManaPotion(character),
-                "mana elixir" => UseManaElixir(character),
-                _ => "That item can't be used or isn't recognized."
-            };
+            string itemName = string.Join(" ", itemNameParts).ToLowerInvariant();
 
-            SaveManager.SaveCharacter(Context.User.Id, character);
-            await ReplyAsync(response);
+            // Check if the item exists in the player's inventory
+            var inventoryItem = character.Inventory.FirstOrDefault(i => i.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+            if (inventoryItem == null)
+            {
+                await ReplyAsync("You don't have that item in your inventory.");
+                return;
+            }
+
+            // Handle item usage (example for health potion)
+            if (inventoryItem == "health potion")
+            {
+                character.Health = Math.Min(character.MaxHealth, character.Health + 50); // Heal the player
+                character.Inventory.Remove(inventoryItem);
+                SaveManager.SaveCharacter(Context.User.Id, character);
+                await ReplyAsync($"You used a **{itemName}** and healed 50 health!");
+            }
+            else
+            {
+                await ReplyAsync($"You can't use the **{itemName}** right now.");
+            }
         }
+
 
 
         [Command("shop")]
@@ -394,6 +404,71 @@ namespace BBtbChallenger.Modules
 
             SaveManager.SaveCharacter(Context.User.Id, character);
         }
+
+        private static Dictionary<ulong, ArenaManager> _activeArenas = new Dictionary<ulong, ArenaManager>();
+
+        [Command("arena")]
+        public async Task Arena()
+        {
+            if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
+            {
+                await ReplyAsync("You haven't started yet. Use `!start` to begin your adventure.");
+                return;
+            }
+
+            if (_activeArenas.ContainsKey(Context.User.Id))
+            {
+                await ReplyAsync("You are already in the arena! Use `!continue` or `!leave`.");
+                return;
+            }
+
+            var arenaManager = new ArenaManager(character, EnemyFactory.GetEnemiesForLevel(character.Level), RemoveArenaPlayer);
+            _activeArenas[Context.User.Id] = arenaManager;
+
+            var result = await arenaManager.StartArena();
+            await ReplyAsync(result);
+        }
+
+        [Command("continue")]
+        public async Task ContinueArena()
+        {
+            if (!_activeArenas.TryGetValue(Context.User.Id, out var arenaManager))
+            {
+                await ReplyAsync("You are not currently in the arena. Start with `!arena` first.");
+                return;
+            }
+
+            var result = await arenaManager.ContinueArena();
+            await ReplyAsync(result);
+        }
+
+        [Command("leave")]
+        public async Task LeaveArena()
+        {
+            if (!_activeArenas.TryGetValue(Context.User.Id, out var arenaManager))
+            {
+                await ReplyAsync("You are not currently in the arena.");
+                return;
+            }
+
+            arenaManager.LeaveArena();
+            _activeArenas.Remove(Context.User.Id);  // Ensure the player is removed from the active arenas
+
+            await ReplyAsync("You left the arena and claimed your rewards! Well done!");
+        }
+
+        // This method removes the player from the active arenas
+        private void RemoveArenaPlayer(ulong userId)
+        {
+            if (_activeArenas.ContainsKey(userId))
+            {
+                _activeArenas.Remove(userId);
+            }
+        }
+
+
+
+
 
 
         // --- Private helper methods below ---

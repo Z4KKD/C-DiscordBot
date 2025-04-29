@@ -1,17 +1,15 @@
 {
   "UserId": 199251469365411840,
   "Name": "shutout",
-  "Level": 4,
-  "Experience": 0,
-  "Health": 130,
-  "Attack": 10,
-  "Defense": 5,
-  "Mana": 10,
-  "MaxMana": 80,
-  "Coins": 206,
-  "Inventory": [
-    "small mana potion"
-  ],
+  "Level": 3,
+  "Experience": 37,
+  "Health": 119,
+  "Attack": 12,
+  "Defense": 7,
+  "Mana": 70,
+  "MaxMana": 70,
+  "Coins": 198,
+  "Inventory": [],
   "Weapon": null,
   "Armor": null,
   "Helmet": null,
@@ -22,7 +20,7 @@
   "HelmetBonus": 0,
   "ShieldBonus": 0,
   "IsAlive": true,
-  "MaxHealth": 130,
+  "MaxHealth": 120,
   "IsPowerUpActive": false,
   "MagicAbilities": [
     "rock"

@@ -45,91 +45,51 @@ namespace BBtbChallenger.GameLogic
             switch (action.ToLower())
             {
                 case "a":
+                    // Attack action
                     damage = character.GetAttackDamage();
                     enemy.Health -= damage;
                     sb.AppendLine($"{character.Name} attacks {enemy.Name} for {damage} damage!");
                     break;
 
                 case "d":
+                    // Defend action
                     sb.AppendLine(Defend(character));
                     break;
 
                 case "m":
-                    // Magic action
+                    // Magic action - use all unlocked abilities
                     string magicUsed = string.Empty;
-                    if (character.MagicAbilities.Contains("rock"))
+                    bool magicCast = false;
+
+                    // Loop through all available abilities and cast them
+                    foreach (var ability in character.MagicAbilities)
                     {
-                        if (character.Mana >= 10)
+                        if (MagicManager.Spells.ContainsKey(ability))
                         {
-                            sb.AppendLine(MagicManager.Spells["rock"].Item3(character, enemy));
-                            character.Mana -= 10;
-                            magicUsed = "rock";
-                        }
-                        else
-                        {
-                            sb.AppendLine("Not enough mana for 'rock' spell!");
+                            var spell = MagicManager.Spells[ability];
+                            int manaCost = spell.ManaCost;
+
+                            // Check if the character has enough mana for the current ability
+                            if (character.Mana >= manaCost)
+                            {
+                                sb.AppendLine(spell.Item3(character, enemy)); // Cast the ability
+                                magicUsed += $"{ability}, "; // Add the used ability to the magicUsed string
+                                magicCast = true;
+                            }
+                            else
+                            {
+                                sb.AppendLine($"Not enough mana for '{ability}' spell!");
+                            }
                         }
                     }
-                    else if (character.MagicAbilities.Contains("fireball"))
+
+                    if (magicCast)
                     {
-                        if (character.Mana >= 15)
-                        {
-                            sb.AppendLine(MagicManager.Spells["fireball"].Item3(character, enemy));
-                            character.Mana -= 15;
-                            magicUsed = "fireball";
-                        }
-                        else
-                        {
-                            sb.AppendLine("Not enough mana for 'fireball' spell!");
-                        }
-                    }
-                    else if (character.MagicAbilities.Contains("stun"))
-                    {
-                        if (character.Mana >= 20)
-                        {
-                            sb.AppendLine(MagicManager.Spells["stun"].Item3(character, enemy));
-                            character.Mana -= 20;
-                            magicUsed = "stun";
-                        }
-                        else
-                        {
-                            sb.AppendLine("Not enough mana for 'stun' spell!");
-                        }
-                    }
-                    else if (character.MagicAbilities.Contains("powerup"))
-                    {
-                        if (character.Mana >= 10)
-                        {
-                            sb.AppendLine(MagicManager.Spells["powerup"].Item3(character, enemy));
-                            character.Mana -= 10;
-                            magicUsed = "powerup";
-                        }
-                        else
-                        {
-                            sb.AppendLine("Not enough mana for 'powerup' spell!");
-                        }
-                    }
-                    else if (character.MagicAbilities.Contains("stun_powerup"))
-                    {
-                        if (character.Mana >= 25)
-                        {
-                            sb.AppendLine(MagicManager.Spells["stun_powerup"].Item3(character, enemy));
-                            character.Mana -= 25;
-                            magicUsed = "stun_powerup";
-                        }
-                        else
-                        {
-                            sb.AppendLine("Not enough mana for 'stun_powerup' spell!");
-                        }
+                        sb.AppendLine($"Used magic abilities: {magicUsed.TrimEnd(',', ' ')}.");
                     }
                     else
                     {
-                        sb.AppendLine("You have no magic ability available!");
-                    }
-
-                    if (!string.IsNullOrEmpty(magicUsed))
-                    {
-                        sb.AppendLine($"Used '{magicUsed}' spell.");
+                        sb.AppendLine("You have no magic ability available or insufficient mana!");
                     }
                     break;
 
@@ -159,13 +119,21 @@ namespace BBtbChallenger.GameLogic
                 return Task.FromResult(sb.ToString());
             }
 
-            // Enemy attacks
-            sb.AppendLine("\nIt's the enemy's turn!");
-            int enemyDamage = Math.Max(0, enemy.Attack - character.Defense);
-            character.Health -= enemyDamage;
-            sb.AppendLine($"{enemy.Name} strikes you for {enemyDamage} damage!");
+            enemy.UpdateStun();
+            if (enemy.IsStunned)
+            {
+                sb.AppendLine($"**{enemy.Name}** is stunned and cannot act this turn!");
+            }
+            else
+            {
+                // Enemy attacks
+                sb.AppendLine("\nIt's the enemy's turn!");
+                int enemyDamage = Math.Max(1, enemy.Attack - character.Defense);
+                character.Health -= enemyDamage;
+                sb.AppendLine($"{enemy.Name} strikes you for {enemyDamage} damage!");
+            }
 
-            // Show current stats after enemy attack
+            // Show current stats after enemy attack or skip
             sb.AppendLine($"\nCurrent Stats: HP: {character.Health}/{character.MaxHealth} | Mana: {character.Mana}/{character.MaxMana}");
             sb.AppendLine($"**{enemy.Name}** HP: {enemy.Health}/{enemy.MaxHealth}");
 
@@ -183,8 +151,6 @@ namespace BBtbChallenger.GameLogic
 
             return Task.FromResult(sb.ToString());
         }
-
-
 
         public static string Defend(RpgCharacter character)
         {

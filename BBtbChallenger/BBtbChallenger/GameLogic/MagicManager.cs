@@ -43,14 +43,15 @@ public static class MagicManager
         {
             "stun",
             (
-                "Stuns an enemy for one turn",
-                15,
+                "Stuns an enemy for two turn",
+                30,
                 (RpgCharacter character, Enemy enemy) =>
                 {
-                    if (character.Mana >= 15)
+                    if (character.Mana >= 30)
                     {
-                        character.Mana -= 15;
+                        character.Mana -= 30;
                         enemy.IsStunned = true;
+                        enemy.TurnsStunned = 2;
                         return $"{character.Name} casts Stun! {enemy.Name} is stunned and cannot act this turn.";
                     }
                     return "Not enough mana to cast Stun.";
@@ -62,7 +63,7 @@ public static class MagicManager
             "powerup",
             (
                 "Doubles the player's attack damage for the next turn",
-                25,
+                40,
                 (RpgCharacter character, Enemy enemy) =>
                 {
                     if (character.Mana >= 25)
