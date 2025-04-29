@@ -1,17 +1,15 @@
 {
-  "UserId": 199251469365411840,
-  "Name": "shutout",
-  "Level": 3,
-  "Experience": 37,
-  "Health": 119,
-  "Attack": 12,
-  "Defense": 7,
-  "Mana": 70,
-  "MaxMana": 70,
-  "Coins": 108,
-  "Inventory": [
-    "bronze sword"
-  ],
+  "UserId": 670045952031064086,
+  "Name": "z4kkd",
+  "Level": 1,
+  "Experience": 0,
+  "Health": 100,
+  "Attack": 10,
+  "Defense": 5,
+  "Mana": 50,
+  "MaxMana": 50,
+  "Coins": 243,
+  "Inventory": [],
   "Weapon": null,
   "Armor": null,
   "Helmet": null,
@@ -22,8 +20,10 @@
   "HelmetBonus": 0,
   "ShieldBonus": 0,
   "IsAlive": true,
-  "MaxHealth": 120,
+  "MaxHealth": 100,
   "IsPowerUpActive": false,
+  "FishingLevel": 2,
+  "FishingExperience": 18,
   "MagicAbilities": [
     "rock"
   ]

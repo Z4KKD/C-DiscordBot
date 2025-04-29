@@ -77,9 +77,10 @@ namespace BBtbChallenger.Modules
 
             await ReplyAsync($"**{character.Name}** - Level {character.Level}\n" +
                              $"HP: {character.Health}/{character.MaxHealth}\n" +
-                             $"Mana: {character.Mana}/{character.MaxMana}\n" + // Added Mana to stats
+                             $"Mana: {character.Mana}/{character.MaxMana}\n" +
                              $"Attack: {character.Attack} | Defense: {character.Defense}\n" +
                              $"XP: {character.Experience}/{character.ExperienceToNextLevel()}\n" +
+                             $"🎣 Fishing Level: {character.FishingLevel}\n" +
                              $"💰 Coins: {character.Coins}");
         }
 
@@ -141,32 +142,24 @@ namespace BBtbChallenger.Modules
                 return;
             }
 
-            bool used = false;
+            string resultMessage = "";
 
             switch (inventoryItem)
             {
                 case "potion":
-                    character.Health = Math.Min(character.MaxHealth, character.Health + 30);
-                    used = true;
-                    await ReplyAsync($"🧪 You used a **Potion** and restored **30 HP**!");
+                    resultMessage = UsePotion(character);
                     break;
 
                 case "elixir":
-                    character.Health = character.MaxHealth;
-                    used = true;
-                    await ReplyAsync($"✨ You used an **Elixir** and fully restored your **Health**!");
+                    resultMessage = UseElixir(character);
                     break;
 
                 case "small mana potion":
-                    character.Mana = Math.Min(character.MaxMana, character.Mana + 30);
-                    used = true;
-                    await ReplyAsync($"🔵 You used a **Small Mana Potion** and restored **30 Mana**!");
+                    resultMessage = UseManaPotion(character);
                     break;
 
                 case "large mana potion":
-                    character.Mana = Math.Min(character.MaxMana, character.Mana + 70);
-                    used = true;
-                    await ReplyAsync($"🔵 You used a **Large Mana Potion** and restored **70 Mana**!");
+                    resultMessage = UseManaElixir(character);
                     break;
 
                 default:
@@ -174,11 +167,79 @@ namespace BBtbChallenger.Modules
                     return;
             }
 
-            if (used)
+            SaveManager.SaveCharacter(Context.User.Id, character);
+            await ReplyAsync(resultMessage);
+        }
+
+        [Command("fish")]
+        public async Task Fish()
+        {
+            if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
             {
-                character.Inventory.Remove(inventoryItem);
-                SaveManager.SaveCharacter(Context.User.Id, character);
+                await ReplyAsync("You haven't started yet. Use `!start` to begin your adventure.");
+                return;
             }
+
+            var fishingMessage = await ReplyAsync("🎣 Starting your fishing session...");
+
+            Random rand = new Random();
+            int totalCoinsEarned = 0;
+            int totalExpEarned = 0;
+            int fishesCaught = 0;
+            int failures = 0;
+
+            var startTime = DateTime.UtcNow;
+            var endTime = startTime.AddSeconds(10); // Fishing session lasts 10 seconds
+
+            while (DateTime.UtcNow < endTime)
+            {
+                int chance = rand.Next(0, 100);
+
+                if (chance < 70)
+                {
+                    int baseCoins = 2; 
+                    int baseExp = 3;   
+
+                    int coinsEarned = baseCoins + character.FishingLevel / 2; 
+                    int expEarned = baseExp + character.FishingLevel / 5;
+
+                    totalCoinsEarned += coinsEarned;
+                    totalExpEarned += expEarned;
+                    fishesCaught++;
+
+                    character.Coins += coinsEarned;
+                    character.GainFishingExperience(expEarned);
+                }
+                else
+                {
+                    failures++;
+                }
+
+                // Update the message
+                await fishingMessage.ModifyAsync(msg =>
+                {
+                    msg.Content = $"🎣 Fishing...\n" +
+                                  $"**Fishes Caught**: {fishesCaught}\n" +
+                                  $"**Failures**: {failures}\n" +
+                                  $"**Coins Earned**: {totalCoinsEarned}\n" +
+                                  $"**Fishing EXP Earned**: {totalExpEarned}\n" +
+                                  $"**Fishing Level**: {character.FishingLevel}";
+                });
+
+                await Task.Delay(1000); // Wait 1 second before next cast
+            }
+
+            SaveManager.SaveCharacter(Context.User.Id, character);
+
+            await fishingMessage.ModifyAsync(msg =>
+            {
+                msg.Content = $"🎣 **Fishing session finished!**\n" +
+                              $"**Total Fishes Caught**: {fishesCaught}\n" +
+                              $"**Total Failures**: {failures}\n" +
+                              $"**Total Coins Earned**: {totalCoinsEarned}\n" +
+                              $"**Total Fishing EXP Earned**: {totalExpEarned}\n" +
+                              $"**Fishing Level**: {character.FishingLevel}";
+            });
         }
 
 
@@ -262,21 +323,37 @@ namespace BBtbChallenger.Modules
         public async Task ShowHelp()
         {
             var sb = new StringBuilder();
-            sb.AppendLine("📖 **RPG Commands Help**");
+            sb.AppendLine("📖 **RPG Commands Guide**");
+            sb.AppendLine();
+            sb.AppendLine("__**Character Commands:**__");
             sb.AppendLine("`!start` - Begin your adventure.");
             sb.AppendLine("`!stats` - View your character's stats.");
-            sb.AppendLine("`!fight` - Fight a random enemy.");
-            sb.AppendLine("`!a [a|d|m]` - Perform an action in battle. Type `!a a` for attack, `!a d` for defend, `!a m` for magic.");
-            sb.AppendLine("`!use [item]` - Use an item from your inventory.");
-            sb.AppendLine("`!shop` - View items available in the shop.");
-            sb.AppendLine("`!buy [item]` - Buy an item from the shop. Example: `!buy bronze shield`.");
-            sb.AppendLine("`!sell [item]` - Sell an item from your inventory.");
             sb.AppendLine("`!inventory` - Check your inventory.");
-            sb.AppendLine("`!equip [sword|shield|armor|helmet]` - Equip your best gear.");
+            sb.AppendLine("`!equip [sword|shield|armor|helmet]` - Equip your best gear automatically.");
+
+            sb.AppendLine();
+            sb.AppendLine("__**Battle Commands:**__");
+            sb.AppendLine("`!fight` - Fight a random enemy.");
+            sb.AppendLine("`!a [a|d|m]` - Perform an action in battle: `a` (attack), `d` (defend), `m` (magic).");
+            sb.AppendLine("`!use [item]` - Use an item from your inventory during battle.");
+
+            sb.AppendLine();
+            sb.AppendLine("__**Fishing Commands:**__");
+            sb.AppendLine("`!fish` - Start a short fishing session for small rewards.");
+
+            sb.AppendLine();
+            sb.AppendLine("__**Shop Commands:**__");
+            sb.AppendLine("`!shop` - View items available to buy.");
+            sb.AppendLine("`!buy [item name]` - Buy an item from the shop. Example: `!buy bronze shield`.");
+            sb.AppendLine("`!sell [item name]` - Sell an item from your inventory.");
+
+            sb.AppendLine();
+            sb.AppendLine("__**Other Commands:**__");
             sb.AppendLine("`!help` - Show this help menu.");
 
             await ReplyAsync(sb.ToString());
         }
+
 
 
         [Command("sell")]

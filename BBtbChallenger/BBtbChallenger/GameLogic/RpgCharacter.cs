@@ -25,7 +25,19 @@
     public bool IsAlive => Health > 0;
     public int MaxHealth => 100 + (Level - 1) * 10;
     public bool IsPowerUpActive { get; set; } = false;
+    public int FishingLevel { get; set; } = 1;
+    public int FishingExperience { get; set; } = 0;
+    public int FishingExpToNextLevel() => 50 + (FishingLevel - 1) * 25;
 
+    public void GainFishingExperience(int amount)
+    {
+        FishingExperience += amount;
+        while (FishingExperience >= FishingExpToNextLevel())
+        {
+            FishingExperience -= FishingExpToNextLevel();
+            FishingLevel++;
+        }
+    }
     // Add UserId to associate character with Discord user
     public RpgCharacter(ulong userId, string name)
     {
