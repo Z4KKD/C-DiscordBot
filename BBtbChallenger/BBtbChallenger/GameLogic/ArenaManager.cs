@@ -14,7 +14,6 @@ public class ArenaManager
     private int _enemiesDefeatedInArena;
     private Action<ulong> _removePlayerFromArena;
 
-
     public ArenaManager(RpgCharacter character, List<Enemy> enemies, Action<ulong> removePlayerFromArena)
     {
         _character = character;
@@ -26,31 +25,46 @@ public class ArenaManager
         _difficultyScaling = 0;
         _enemiesDefeatedInArena = 0;
         _removePlayerFromArena = removePlayerFromArena;
-
     }
 
     public async Task<string> StartArena()
     {
+        return await StartOrContinueArena("Welcome to the Arena, {_character.Name}!", false);
+    }
+
+    public async Task<string> ContinueArena()
+    {
+        return await StartOrContinueArena($"You chose to continue!", true);
+    }
+
+    private async Task<string> StartOrContinueArena(string introMessage, bool isContinuing)
+    {
         var sb = new StringBuilder();
-        sb.AppendLine($"Welcome to the Arena, {_character.Name}!");
-        sb.AppendLine($"Prepare to face 5 enemies.");
+        sb.AppendLine(introMessage);
         sb.AppendLine($"**Starting Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
 
         int totalEnemiesDefeated = 0;
+
+        if (isContinuing)
+        {
+            _difficultyScaling += 1;  // Increase difficulty
+        }
+
+        if (_enemiesDefeatedInArena % 15 == 0 && _enemiesDefeatedInArena != 0)
+        {
+            _rewardMultiplier += 1;
+            sb.AppendLine($"🎉 **Bonus Unlocked!** Your reward multiplier is now x{_rewardMultiplier}!");
+        }
 
         for (int i = 0; i < 5; i++)
         {
             var enemy = GenerateScaledEnemy();
             var result = await FightEnemy(enemy);
 
-            if (!result.Item1)
+            if (!result.IsSuccessful)
             {
-                sb.AppendLine("You were defeated in the arena...");
-                sb.AppendLine("You lost all rewards. Better luck next time!");
-                _removePlayerFromArena(_character.UserId);
-                _character.Die();
-                _totalCoins = 0;
-                _totalExperience = 0;
+                sb.AppendLine(result.Message);
+                ResetArena();
                 return sb.ToString();
             }
 
@@ -64,7 +78,6 @@ public class ArenaManager
         sb.AppendLine($"Total Enemies Defeated: {totalEnemiesDefeated}");
         sb.AppendLine($"Total XP Earned: {_totalExperience}, Total Coins Earned: {_totalCoins}");
         sb.AppendLine($"Reward Multiplier: x{_rewardMultiplier}");
-        sb.AppendLine();
         sb.AppendLine($"**Current Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
         sb.AppendLine("You completed all 5 fights!");
         sb.AppendLine("Do you want to leave with your rewards or continue for bigger rewards?");
@@ -72,111 +85,32 @@ public class ArenaManager
         return sb.ToString();
     }
 
-
-
-    public async Task<string> ContinueArena()
-    {
-        // Check if the player is still alive
-        if (!_character.IsAlive)
-        {
-            return "You cannot continue because you were defeated in the arena. You lost all rewards. Better luck next time!";
-        }
-
-        _difficultyScaling += 1;
-
-        var sb = new StringBuilder();
-
-        // Check if enough enemies defeated to increase reward multiplier
-        if (_enemiesDefeatedInArena % 15 == 0 && _enemiesDefeatedInArena != 0)
-        {
-            _rewardMultiplier *= 1;
-            sb.AppendLine($"🎉 **Bonus Unlocked!** Your reward multiplier has doubled to x{_rewardMultiplier}!");
-        }
-        else
-        {
-            sb.AppendLine($"You chose to continue! Your reward multiplier is still x{_rewardMultiplier}.");
-        }
-
-        sb.AppendLine($"Enemies are now stronger!");
-        sb.AppendLine($"**Starting Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
-
-        int totalEnemiesDefeated = 0;
-
-        for (int i = 0; i < 5; i++)
-        {
-            var enemy = GenerateScaledEnemy();
-            var result = await FightEnemy(enemy);
-
-            if (!result.Item1)
-            {
-                sb.AppendLine("You were defeated in the arena...");
-                sb.AppendLine("You lost all rewards. Better luck next time!");
-                _removePlayerFromArena(_character.UserId);
-                _character.Die();
-                _totalCoins = 0;
-                _totalExperience = 0;
-                return sb.ToString();
-            }
-
-            totalEnemiesDefeated++;
-            _enemiesDefeatedInArena++;
-            _totalExperience += enemy.ExperienceReward;
-            _totalCoins += enemy.GetCoinDrop();
-        }
-
-        sb.AppendLine($"--- Fight Summary ---");
-        sb.AppendLine($"Total Enemies Defeated This Round: {totalEnemiesDefeated}");
-        sb.AppendLine($"Total XP Earned: {_totalExperience}, Total Coins Earned: {_totalCoins}");
-        sb.AppendLine($"Reward Multiplier: x{_rewardMultiplier}");
-        sb.AppendLine();
-        sb.AppendLine($"**Current Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
-        sb.AppendLine("You completed another 5 fights!");
-        sb.AppendLine("Do you want to leave with your rewards or continue for even bigger rewards?");
-
-        return sb.ToString();
-    }
-
-
-    private async Task<Tuple<bool, string>> FightEnemy(Enemy enemy)
+    private async Task<BattleResult> FightEnemy(Enemy enemy)
     {
         while (_character.IsAlive && enemy.IsAlive)
         {
-            // Attack the enemy
             enemy.Health -= _character.GetAttackDamage();
             if (enemy.IsAlive)
             {
-                // Calculate enemy damage and apply to the character
-                int enemyDamage = Math.Max(1, enemy.Attack - (int)(0.5 * _character.Defense)); // Ensure there's at least 1 damage
+                int enemyDamage = Math.Max(1, enemy.Attack - (int)(0.5 * _character.Defense));
                 _character.Health -= enemyDamage;
-
-                // Add debug logs for health reduction
-                Console.WriteLine($"Enemy dealt {enemyDamage} damage to {_character.Name}. Current Health: {_character.Health}");
-
-                // Check if character is still alive
                 if (_character.Health <= 0)
                 {
-                    Console.WriteLine($"{_character.Name} has been defeated!");
-                    _character.Die();
-                    _totalCoins = 0;
-                    _totalExperience = 0;
-                    SaveManager.SaveCharacter(_character.UserId, _character);
-                    // Automatically leave the arena when defeated
-                    LeaveArena();  // Ensure the player is removed from the arena when defeated
-
-                    return new Tuple<bool, string>(false, "You lost. You lost all rewards. Better luck next time!");
+                    return new BattleResult(false, "You lost. You lost all rewards. Better luck next time!");
                 }
             }
         }
 
-        // If the enemy is defeated
-        return _character.IsAlive
-            ? new Tuple<bool, string>(true, "You won!")
-            : new Tuple<bool, string>(false, "You lost.");
+        return new BattleResult(true, "You won!");
     }
 
-
-
-
+    private void ResetArena()
+    {
+        _removePlayerFromArena(_character.UserId);
+        _character.Die();
+        _totalCoins = 0;
+        _totalExperience = 0;
+    }
 
     private Enemy GenerateScaledEnemy()
     {
@@ -184,7 +118,7 @@ public class ArenaManager
         var scaledEnemy = baseEnemy.Clone();
 
         scaledEnemy.MaxHealth += 10 * _difficultyScaling;
-        scaledEnemy.Health = scaledEnemy.MaxHealth; 
+        scaledEnemy.Health = scaledEnemy.MaxHealth;
         scaledEnemy.Attack += 2 * _difficultyScaling;
         scaledEnemy.ExperienceReward += 5;
         scaledEnemy.CoinDropMin += 2;
@@ -193,24 +127,25 @@ public class ArenaManager
         return scaledEnemy;
     }
 
-
     public void LeaveArena()
     {
-        // Finalize and apply the rewards when leaving
-        // Only apply rewards if the player is still alive (i.e., not defeated)
         if (_character.IsAlive)
         {
             _character.Coins += (_totalCoins * _rewardMultiplier);
             _character.GainExperience(_totalExperience);
         }
-        else
-        {
-            // Player lost, don't give any rewards
-            Console.WriteLine($"{_character.Name} lost, no rewards will be given.");
-        }
-
-        // Save character data
         SaveManager.SaveCharacter(_character.UserId, _character);
     }
+}
 
+public class BattleResult
+{
+    public bool IsSuccessful { get; }
+    public string Message { get; }
+
+    public BattleResult(bool isSuccessful, string message)
+    {
+        IsSuccessful = isSuccessful;
+        Message = message;
+    }
 }

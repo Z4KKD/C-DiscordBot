@@ -1,0 +1,34 @@
+{
+  "UserId": 670045952031064086,
+  "Name": "z4kkd",
+  "Level": 5,
+  "Experience": 139,
+  "Health": 140,
+  "Attack": 24,
+  "Defense": 9,
+  "Mana": 90,
+  "MaxMana": 90,
+  "Coins": 7,
+  "Inventory": [
+    "bronze shield",
+    "iron sword"
+  ],
+  "Weapon": "iron sword",
+  "Armor": null,
+  "Helmet": null,
+  "Shield": null,
+  "LastDeathTime": "0001-01-01T00:00:00",
+  "WeaponBonus": 10,
+  "ArmorBonus": 0,
+  "HelmetBonus": 0,
+  "ShieldBonus": 0,
+  "IsAlive": true,
+  "MaxHealth": 140,
+  "IsPowerUpActive": false,
+  "FishingLevel": 1,
+  "FishingExperience": 18,
+  "MagicAbilities": [
+    "rock",
+    "fireball"
+  ]
+}

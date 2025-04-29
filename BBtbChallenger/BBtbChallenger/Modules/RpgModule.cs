@@ -222,7 +222,7 @@ namespace BBtbChallenger.Modules
                     failures++;
                 }
 
-                // Update the message
+                // Update the message every second instead of checking it in a loop
                 await fishingMessage.ModifyAsync(msg =>
                 {
                     msg.Content = $"🎣 Fishing...\n" +
@@ -251,6 +251,7 @@ namespace BBtbChallenger.Modules
                               $"**Fishing Level**: {character.FishingLevel}";
             });
         }
+
 
         [Command("shop")]
         public async Task ShowShop()
@@ -600,11 +601,6 @@ namespace BBtbChallenger.Modules
                 _activeArenas.Remove(userId);
             }
         }
-
-
-
-
-
 
         // --- Private helper methods below ---
 
