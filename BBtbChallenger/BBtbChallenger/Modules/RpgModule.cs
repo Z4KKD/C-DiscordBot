@@ -27,24 +27,13 @@ namespace BBtbChallenger.Modules
             { "bronze sword", ("A basic bronze sword.", 125) },
             { "bronze shield", ("A basic bronze shield. ", 100) },
             { "bronze helmet", ("A simple bronze helmet.", 75) },
+            { "bronze armor", ("A simple bronze armor. ", 150) },
 
             // Iron gear
             { "iron sword", ("A sturdy iron sword. ", 250) },
             { "iron shield", ("A sturdy iron shield. ", 225) },
             { "iron helmet", ("A strong iron helmet. ", 200) },
-            { "iron armor", ("Protective iron armor. ", 300) },
-
-            // Steel gear
-            { "steel sword", ("A sharp steel sword. ", 450) },
-            { "steel shield", ("A heavy steel shield. ", 420) },
-            { "steel helmet", ("A durable steel helmet. ", 370) },
-            { "steel armor", ("Solid steel armor. ", 500) },
-
-            // Silver gear
-            { "silver sword", ("A refined silver sword.", 800) },
-            { "silver shield", ("A polished silver shield.", 770) },
-            { "silver helmet", ("A strong silver helmet. ", 730) },
-            { "silver armor", ("Shining silver armor.", 900) }
+            { "iron armor", ("Protective iron armor. ", 300) }
         };
 
 
@@ -178,7 +167,7 @@ namespace BBtbChallenger.Modules
         public async Task Fish()
         {
             // Define the cooldown time (e.g., 60 seconds)
-            TimeSpan cooldown = TimeSpan.FromSeconds(60);
+            TimeSpan cooldown = TimeSpan.FromSeconds(20);
 
             // Check if the user has fished recently
             if (LastFishingTime.ContainsKey(Context.User.Id))
@@ -429,21 +418,21 @@ namespace BBtbChallenger.Modules
             {
                 { "bronze sword", 5 }, { "iron sword", 10 }, { "steel sword", 15 },
                 { "silver sword", 20 }, { "gold sword", 25 }, { "mithril sword", 30 },
-                { "adamantite sword", 35 }, { "platinum sword", 40 }
+                { "adamantite sword", 35 }, { "platinum sword", 60 }
             };
 
                     Dictionary<string, int> armorPower = new()
             {
                 { "iron armor", 10 }, { "steel armor", 15 }, { "silver armor", 20 },
                 { "gold armor", 25 }, { "mithril armor", 30 }, { "adamantite armor", 35 },
-                { "platinum armor", 40 }
+                { "platinum armor", 50 }
             };
 
                     Dictionary<string, int> shieldPower = new()
             {
                 { "bronze shield", 5 }, { "iron shield", 10 }, { "steel shield", 15 },
                 { "silver shield", 20 }, { "gold shield", 25 }, { "mithril shield", 30 },
-                { "adamantite shield", 35 }, { "platinum shield", 40 }
+                { "adamantite shield", 35 }, { "platinum shield", 60 }
             };
 
                     Dictionary<string, int> helmetPower = new()

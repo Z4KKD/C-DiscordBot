@@ -35,13 +35,8 @@ public class ArenaManager
         sb.AppendLine($"Welcome to the Arena, {_character.Name}!");
         sb.AppendLine($"Prepare to face 5 enemies.");
         sb.AppendLine($"**Starting Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
-        sb.AppendLine($"**Reward Multiplier**: x{_rewardMultiplier}");
 
         int totalEnemiesDefeated = 0;
-
-        // Do not reset health here! We should use current health
-        //int originalHealth = _character.Health; // Remove this
-        //int originalMana = _character.Mana;   // Remove this
 
         for (int i = 0; i < 5; i++)
         {
@@ -54,6 +49,8 @@ public class ArenaManager
                 sb.AppendLine("You lost all rewards. Better luck next time!");
                 _removePlayerFromArena(_character.UserId);
                 _character.Die();
+                _totalCoins = 0;
+                _totalExperience = 0;
                 return sb.ToString();
             }
 
@@ -102,7 +99,6 @@ public class ArenaManager
 
         sb.AppendLine($"Enemies are now stronger!");
         sb.AppendLine($"**Starting Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
-        sb.AppendLine($"**Reward Multiplier**: x{_rewardMultiplier}");
 
         int totalEnemiesDefeated = 0;
 
@@ -117,6 +113,8 @@ public class ArenaManager
                 sb.AppendLine("You lost all rewards. Better luck next time!");
                 _removePlayerFromArena(_character.UserId);
                 _character.Die();
+                _totalCoins = 0;
+                _totalExperience = 0;
                 return sb.ToString();
             }
 
@@ -159,8 +157,9 @@ public class ArenaManager
                 {
                     Console.WriteLine($"{_character.Name} has been defeated!");
                     _character.Die();
+                    _totalCoins = 0;
+                    _totalExperience = 0;
                     SaveManager.SaveCharacter(_character.UserId, _character);
-
                     // Automatically leave the arena when defeated
                     LeaveArena();  // Ensure the player is removed from the arena when defeated
 
@@ -187,9 +186,9 @@ public class ArenaManager
         scaledEnemy.MaxHealth += 10 * _difficultyScaling;
         scaledEnemy.Health = scaledEnemy.MaxHealth; 
         scaledEnemy.Attack += 2 * _difficultyScaling;
-        scaledEnemy.ExperienceReward += 5 * _difficultyScaling;
-        scaledEnemy.CoinDropMin += 2 * _difficultyScaling;
-        scaledEnemy.CoinDropMax += 4 * _difficultyScaling;
+        scaledEnemy.ExperienceReward += 5;
+        scaledEnemy.CoinDropMin += 2;
+        scaledEnemy.CoinDropMax += 4;
 
         return scaledEnemy;
     }

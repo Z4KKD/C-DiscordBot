@@ -3,12 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|c:\\users\\zdunc\\onedrive\\documents\\projects\\c-practice\\c\\c-discordbot\\bbtbchallenger\\bbtbchallenger\\gamelogic\\arenamanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|solutionrelative:bbtbchallenger\\gamelogic\\arenamanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|c:\\users\\zdunc\\onedrive\\documents\\projects\\c-practice\\c\\c-discordbot\\bbtbchallenger\\bbtbchallenger\\modules\\rpgmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|solutionrelative:bbtbchallenger\\modules\\rpgmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|c:\\users\\zdunc\\onedrive\\documents\\projects\\c-practice\\c\\c-discordbot\\bbtbchallenger\\bbtbchallenger\\gamelogic\\rpgcharacter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|solutionrelative:bbtbchallenger\\gamelogic\\rpgcharacter.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|c:\\users\\zdunc\\onedrive\\documents\\projects\\c-practice\\c\\c-discordbot\\bbtbchallenger\\bbtbchallenger\\gamelogic\\enemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2E84F8EF-5D38-4615-8A0F-4AC6268D5B54}|BBtbChallenger\\BBtbChallenger.csproj|solutionrelative:bbtbchallenger\\gamelogic\\enemy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,17 +26,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "RpgModule.cs",
               "DocumentMoniker": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\Modules\\RpgModule.cs",
               "RelativeDocumentMoniker": "BBtbChallenger\\Modules\\RpgModule.cs",
               "ToolTip": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\Modules\\RpgModule.cs",
               "RelativeToolTip": "BBtbChallenger\\Modules\\RpgModule.cs",
-              "ViewState": "AgIAALYAAAAAAAAAAAD4v8sAAAAlAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAACIAAAA/AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-24T15:21:30.317Z",
               "IsPinned": true,
@@ -36,13 +44,39 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
+              "Title": "ArenaManager.cs",
+              "DocumentMoniker": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\GameLogic\\ArenaManager.cs",
+              "RelativeDocumentMoniker": "BBtbChallenger\\GameLogic\\ArenaManager.cs",
+              "ToolTip": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\GameLogic\\ArenaManager.cs",
+              "RelativeToolTip": "BBtbChallenger\\GameLogic\\ArenaManager.cs",
+              "ViewState": "AgIAADYAAAAAAAAAAAAowHoAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T02:23:51.902Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Enemy.cs",
+              "DocumentMoniker": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\GameLogic\\Enemy.cs",
+              "RelativeDocumentMoniker": "BBtbChallenger\\GameLogic\\Enemy.cs",
+              "ToolTip": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\GameLogic\\Enemy.cs",
+              "RelativeToolTip": "BBtbChallenger\\GameLogic\\Enemy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEIAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-04-29T02:12:30.029Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "RpgCharacter.cs",
               "DocumentMoniker": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\GameLogic\\RpgCharacter.cs",
               "RelativeDocumentMoniker": "BBtbChallenger\\GameLogic\\RpgCharacter.cs",
               "ToolTip": "C:\\Users\\Zdunc\\OneDrive\\Documents\\Projects\\C-Practice\\C\\C-DiscordBot\\BBtbChallenger\\BBtbChallenger\\GameLogic\\RpgCharacter.cs",
               "RelativeToolTip": "BBtbChallenger\\GameLogic\\RpgCharacter.cs",
-              "ViewState": "AgIAAA8AAAAAAAAAAIA9wBsAAAATAAAAAAAAAA==",
+              "ViewState": "AgIAAA8AAAAAAAAAAIA9wB8AAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-24T15:20:59.231Z",
               "EditorCaption": ""
