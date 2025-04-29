@@ -8,7 +8,7 @@
   "Defense": 5,
   "Mana": 50,
   "MaxMana": 50,
-  "Coins": 243,
+  "Coins": 346,
   "Inventory": [],
   "Weapon": null,
   "Armor": null,
@@ -22,8 +22,8 @@
   "IsAlive": true,
   "MaxHealth": 100,
   "IsPowerUpActive": false,
-  "FishingLevel": 2,
-  "FishingExperience": 18,
+  "FishingLevel": 3,
+  "FishingExperience": 51,
   "MagicAbilities": [
     "rock"
   ]

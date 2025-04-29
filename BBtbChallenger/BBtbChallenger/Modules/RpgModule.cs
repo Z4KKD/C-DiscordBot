@@ -18,32 +18,33 @@ namespace BBtbChallenger.Modules
         private static readonly Dictionary<string, (string Description, int Price)> shopItems = new()
         {
             // Potions
-            { "potion", ("Restores 30 HP", 35) },
+            { "potion", ("Restores 30 HP", 30) },
             { "elixir", ("Fully restores health", 100) },
             { "small mana potion", ("Restores 30 Mana", 30) },
             { "large mana potion", ("Restores 70 Mana", 70) },
 
             // Bronze gear
-            { "bronze sword", ("A basic bronze sword.", 90) },
-            { "bronze shield", ("A basic bronze shield. ", 75) },
-            { "bronze helmet", ("A simple bronze helmet.", 60) },
+            { "bronze sword", ("A basic bronze sword.", 125) },
+            { "bronze shield", ("A basic bronze shield. ", 100) },
+            { "bronze helmet", ("A simple bronze helmet.", 75) },
 
             // Iron gear
-            { "iron sword", ("A sturdy iron sword. ", 180) },
-            { "iron shield", ("A sturdy iron shield. ", 150) },
-            { "iron helmet", ("A strong iron helmet. ", 130) },
-            { "iron armor", ("Protective iron armor. ", 220) },
+            { "iron sword", ("A sturdy iron sword. ", 250) },
+            { "iron shield", ("A sturdy iron shield. ", 225) },
+            { "iron helmet", ("A strong iron helmet. ", 200) },
+            { "iron armor", ("Protective iron armor. ", 300) },
 
             // Steel gear
-            { "steel sword", ("A sharp steel sword. ", 300) },
-            { "steel shield", ("A heavy steel shield. ", 250) },
-            { "steel helmet", ("A durable steel helmet. ", 220) },
-            { "steel armor", ("Solid steel armor. ", 400) },
+            { "steel sword", ("A sharp steel sword. ", 450) },
+            { "steel shield", ("A heavy steel shield. ", 420) },
+            { "steel helmet", ("A durable steel helmet. ", 370) },
+            { "steel armor", ("Solid steel armor. ", 500) },
 
             // Silver gear
-            { "silver sword", ("A refined silver sword.", 450) },
-            { "silver shield", ("A polished silver shield.", 380) },
-            { "silver armor", ("Shining silver armor.", 600) }
+            { "silver sword", ("A refined silver sword.", 800) },
+            { "silver shield", ("A polished silver shield.", 770) },
+            { "silver helmet", ("A strong silver helmet. ", 730) },
+            { "silver armor", ("Shining silver armor.", 900) }
         };
 
 
@@ -171,9 +172,26 @@ namespace BBtbChallenger.Modules
             await ReplyAsync(resultMessage);
         }
 
+        private static Dictionary<ulong, DateTime> LastFishingTime = new Dictionary<ulong, DateTime>();
+
         [Command("fish")]
         public async Task Fish()
         {
+            // Define the cooldown time (e.g., 60 seconds)
+            TimeSpan cooldown = TimeSpan.FromSeconds(60);
+
+            // Check if the user has fished recently
+            if (LastFishingTime.ContainsKey(Context.User.Id))
+            {
+                DateTime lastFishing = LastFishingTime[Context.User.Id];
+                if (DateTime.UtcNow - lastFishing < cooldown)
+                {
+                    var timeLeft = cooldown - (DateTime.UtcNow - lastFishing);
+                    await ReplyAsync($"You need to wait {timeLeft.TotalSeconds:F1} seconds before you can fish again.");
+                    return;
+                }
+            }
+
             if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
             {
                 await ReplyAsync("You haven't started yet. Use `!start` to begin your adventure.");
@@ -197,10 +215,10 @@ namespace BBtbChallenger.Modules
 
                 if (chance < 70)
                 {
-                    int baseCoins = 2; 
-                    int baseExp = 3;   
+                    int baseCoins = 1;
+                    int baseExp = 3;
 
-                    int coinsEarned = baseCoins + character.FishingLevel / 2; 
+                    int coinsEarned = baseCoins + character.FishingLevel / 2;
                     int expEarned = baseExp + character.FishingLevel / 5;
 
                     totalCoinsEarned += coinsEarned;
@@ -231,6 +249,9 @@ namespace BBtbChallenger.Modules
 
             SaveManager.SaveCharacter(Context.User.Id, character);
 
+            // Update last fishing time
+            LastFishingTime[Context.User.Id] = DateTime.UtcNow;
+
             await fishingMessage.ModifyAsync(msg =>
             {
                 msg.Content = $"🎣 **Fishing session finished!**\n" +
@@ -241,7 +262,6 @@ namespace BBtbChallenger.Modules
                               $"**Fishing Level**: {character.FishingLevel}";
             });
         }
-
 
         [Command("shop")]
         public async Task ShowShop()
