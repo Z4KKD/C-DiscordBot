@@ -8,7 +8,7 @@
   "Defense": 5,
   "Mana": 30,
   "MaxMana": 50,
-  "Coins": 111,
+  "Coins": 146,
   "Inventory": [
     "bronze sword",
     "potion"
@@ -25,8 +25,8 @@
   "IsAlive": true,
   "MaxHealth": 100,
   "IsPowerUpActive": false,
-  "FishingLevel": 1,
-  "FishingExperience": 0,
+  "FishingLevel": 2,
+  "FishingExperience": 28,
   "MagicAbilities": [
     "rock"
   ]

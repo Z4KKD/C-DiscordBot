@@ -45,6 +45,7 @@ namespace BBtbChallenger.Modules
             { "silver sword", ("A brilliant silver sword.", 1200, 20) },
             { "silver shield", ("A reflective silver shield.", 1140, 20) },
             { "silver armor", ("Shiny silver armor.", 1260, 20) },
+            { "silver helmet", ("A golden helmet.", 1150, 20) },
 
             // Gold gear
             { "gold sword", ("A gleaming gold sword.", 1500, 25) },
@@ -56,20 +57,19 @@ namespace BBtbChallenger.Modules
             { "mithril sword", ("A lightweight mithril sword.", 1800, 30) },
             { "mithril shield", ("A strong mithril shield.", 1740, 30) },
             { "mithril armor", ("Reinforced mithril armor.", 1950, 30) },
+            { "mithril helmet",("Strong mithril helmet", 1690, 30) },
 
             // Adamantite gear
             { "adamantite sword", ("A nearly unbreakable sword.", 2250, 35) },
             { "adamantite armor", ("Armor of the gods.", 2400, 35) },
             { "adamantite shield", ("An indestructible shield.", 2100, 35) },
-
+            { "adamantite helmet", ("Unstoppable helmet", 2000, 35) },
             // Platinum gear
             { "platinum sword", ("The finest sword ever forged.", 3000, 40) },
             { "platinum armor", ("Unmatched platinum armor.", 3300, 40) },
-            { "platinum shield", ("A legendary shield.", 2850, 40) }
+            { "platinum shield", ("A legendary shield.", 2850, 40) },
+            { "platinum helmet", ("A legendary helmet.", 2730, 40) }
         };
-
-
-
 
 
         [Command("start")]
@@ -362,21 +362,31 @@ namespace BBtbChallenger.Modules
                 return;
             }
 
+            var sb = new StringBuilder();
+
+            sb.AppendLine("🛡️ **Equipped Gear:**");
+            sb.AppendLine($"• Weapon: {(character.Weapon != null ? $"{character.Weapon} (+{character.WeaponBonus} ATK)" : "None")}");
+            sb.AppendLine($"• Armor: {(character.Armor != null ? $"{character.Armor} (+{character.ArmorBonus} DEF)" : "None")}");
+            sb.AppendLine($"• Shield: {(character.Shield != null ? $"{character.Shield} (+{character.ShieldBonus} DEF)" : "None")}");
+            sb.AppendLine($"• Helmet: {(character.Helmet != null ? $"{character.Helmet} (+{character.HelmetBonus} DEF)" : "None")}");
+
+            sb.AppendLine("\n🎒 **Your Inventory:**");
             if (!character.Inventory.Any())
             {
-                await ReplyAsync("Your inventory is empty.");
-                return;
+                sb.AppendLine("• (empty)");
             }
-
-            var groupedItems = character.Inventory.GroupBy(i => i).ToDictionary(g => g.Key, g => g.Count());
-
-            var sb = new StringBuilder();
-            sb.AppendLine("🎒 **Your Inventory:**");
-            foreach (var item in groupedItems)
-                sb.AppendLine($"• {item.Key} x{item.Value}");
+            else
+            {
+                var groupedItems = character.Inventory.GroupBy(i => i).ToDictionary(g => g.Key, g => g.Count());
+                foreach (var item in groupedItems)
+                {
+                    sb.AppendLine($"• {item.Key} x{item.Value}");
+                }
+            }
 
             await ReplyAsync(sb.ToString());
         }
+
 
         [Command("help")]
         public async Task ShowHelp()
@@ -502,7 +512,8 @@ namespace BBtbChallenger.Modules
                     Dictionary<string, int> helmetPower = new()
             {
                 { "bronze helmet", 5 }, { "iron helmet", 10 }, { "steel helmet", 15 },
-                { "gold helmet", 20 }
+                { "silver helmet", 20 }, { "gold helmet", 25 }, { "mithril helmet", 30 },
+                { "adamantite helmet", 35 },  { "platinum helmet", 40 }
             };
 
             string? bestItem = null;

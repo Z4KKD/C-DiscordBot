@@ -114,9 +114,9 @@ namespace BBtbChallenger.GameLogic
         {
             List<Enemy> enemies = new List<Enemy>();
 
-            float healthScalingFactor = 1 + (level - 1) * 0.2f;
-            float attackScalingFactor = 1 + (level - 1) * 0.2f;
-            float expScalingFactor = 1 + (level - 1) * 0.2f;
+            float healthScalingFactor = 1 + (level - 1) * 0.05f;
+            float attackScalingFactor = 1 + (level - 1) * 0.05f;
+            float expScalingFactor = 1 + (level - 1) * 0.1f;
 
             if (level < 10)
             {
@@ -237,46 +237,22 @@ namespace BBtbChallenger.GameLogic
                     new Drop("large mana potion", 65)
                 }, healthScalingFactor, attackScalingFactor, expScalingFactor));
             }
-            else
+            else if (level < 45)
             {
-                // Extra scaling for Ancient Dragon and Elder Lich
-                float bossHealthScaling = 1 + (level - 50) * 0.15f;
-                float bossAttackScaling = 1 + (level - 50) * 0.1f;
-                float bossExpScaling = 1 + (level - 50) * 0.25f;
+                enemies.Add(CreateEnemy("Ancient Dragon", 350, 85, 500, 250, 400, new List<Drop>
+            {
+                new Drop("platinum sword", 80),
+                new Drop("platinum armor", 75),
+                new Drop("platinum shield", 70)
+            }, healthScalingFactor, attackScalingFactor, expScalingFactor));
 
-                // Ancient Dragon
-                enemies.Add(CreateEnemy("Ancient Dragon",
-                    (int)(350 * bossHealthScaling),
-                    (int)(100 * bossAttackScaling),
-                    (int)(700 * bossExpScaling),
-                    300 + (level * 5),
-                    500 + (level * 10),
-                    new List<Drop>
-                    {
-            new Drop("platinum sword", 80),
-            new Drop("platinum armor", 75),
-            new Drop("platinum shield", 70)
-                    },
-                    1f, 1f, 1f // No additional scaling here, we manually scaled above
-                ));
-
-                // Elder Lich
-                enemies.Add(CreateEnemy("Elder Lich",
-                    (int)(400 * bossHealthScaling),
-                    (int)(120 * bossAttackScaling),
-                    (int)(800 * bossExpScaling),
-                    350 + (level * 6),
-                    600 + (level * 12),
-                    new List<Drop>
-                    {
-            new Drop("platinum sword", 80),
-            new Drop("platinum armor", 75),
-            new Drop("platinum shield", 70)
-                    },
-                    1f, 1f, 1f
-                ));
+                        enemies.Add(CreateEnemy("Elder Lich", 375, 95, 550, 275, 420, new List<Drop>
+            {
+                new Drop("platinum sword", 80),
+                new Drop("platinum armor", 75),
+                new Drop("platinum shield", 70)
+            }, healthScalingFactor, attackScalingFactor, expScalingFactor));
             }
-
 
             return enemies;
         }
@@ -285,7 +261,6 @@ namespace BBtbChallenger.GameLogic
         {
             List<Drop> drops = new List<Drop>();
 
-            // Now we make it much easier to get drops
             foreach (var drop in possibleDrops)
             {
                 if (_random.Next(100) < drop.Chance)

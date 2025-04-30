@@ -50,13 +50,13 @@ public class ArenaManager
             _difficultyScaling += 1;  // Increase difficulty
         }
 
-        if (_enemiesDefeatedInArena % 15 == 0 && _enemiesDefeatedInArena != 0)
+        if (_enemiesDefeatedInArena % 9 == 0 && _enemiesDefeatedInArena != 0)
         {
             _rewardMultiplier += 1;
             sb.AppendLine($"🎉 **Bonus Unlocked!** Your reward multiplier is now x{_rewardMultiplier}!");
         }
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 3; i++)
         {
             var enemy = GenerateScaledEnemy();
             var result = await FightEnemy(enemy);
@@ -72,6 +72,7 @@ public class ArenaManager
             _enemiesDefeatedInArena++;
             _totalExperience += enemy.ExperienceReward;
             _totalCoins += enemy.GetCoinDrop();
+
         }
 
         sb.AppendLine($"--- Fight Summary ---");
@@ -79,7 +80,7 @@ public class ArenaManager
         sb.AppendLine($"Total XP Earned: {_totalExperience}, Total Coins Earned: {_totalCoins}");
         sb.AppendLine($"Reward Multiplier: x{_rewardMultiplier}");
         sb.AppendLine($"**Current Stats**: Health: {_character.Health}/{_character.MaxHealth}, Mana: {_character.Mana}/{_character.MaxMana}");
-        sb.AppendLine("You completed all 5 fights!");
+        sb.AppendLine("You completed all 3 fights!");
         sb.AppendLine("Do you want to leave with your rewards or continue for bigger rewards?");
 
         return sb.ToString();
@@ -92,7 +93,8 @@ public class ArenaManager
             enemy.Health -= _character.GetAttackDamage();
             if (enemy.IsAlive)
             {
-                int enemyDamage = Math.Max(1, enemy.Attack - (int)(0.5 * _character.Defense));
+                int enemyDamage = Math.Max(1, enemy.Attack - _character.Defense);
+                enemyDamage = (int)(enemyDamage * (0.85 + 0.3 * _random.NextDouble())); 
                 _character.Health -= enemyDamage;
                 if (_character.Health <= 0)
                 {
@@ -100,6 +102,7 @@ public class ArenaManager
                 }
             }
         }
+        _character.Attack += 3;
 
         return new BattleResult(true, "You won!");
     }
@@ -116,10 +119,10 @@ public class ArenaManager
     {
         var baseEnemy = _enemies[_random.Next(_enemies.Count)];
         var scaledEnemy = baseEnemy.Clone();
-
-        scaledEnemy.MaxHealth += 5 * _difficultyScaling;
+        int scalingFactor = Math.Min((int)Math.Sqrt(_difficultyScaling), 2);
+        scaledEnemy.MaxHealth += 2 * scalingFactor;
         scaledEnemy.Health = scaledEnemy.MaxHealth;
-        scaledEnemy.Attack += 2 * _difficultyScaling;
+        scaledEnemy.Attack += 1 * (scalingFactor > 0 ? 1 : 0);
         scaledEnemy.ExperienceReward += 5;
         scaledEnemy.CoinDropMin += 2;
         scaledEnemy.CoinDropMax += 4;
