@@ -114,9 +114,9 @@ namespace BBtbChallenger.GameLogic
         {
             List<Enemy> enemies = new List<Enemy>();
 
-            float healthScalingFactor = 1 + (level - 1) * 0.05f;
-            float attackScalingFactor = 1 + (level - 1) * 0.03f;
-            float expScalingFactor = 1 + (level - 1) * 0.1f;
+            float healthScalingFactor = 1 + (level - 1) * 0.2f;
+            float attackScalingFactor = 1 + (level - 1) * 0.2f;
+            float expScalingFactor = 1 + (level - 1) * 0.2f;
 
             if (level < 10)
             {

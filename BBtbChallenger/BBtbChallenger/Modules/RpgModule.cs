@@ -15,26 +15,60 @@ namespace BBtbChallenger.Modules
     public class RpgModule : ModuleBase<SocketCommandContext>
     {
         private static ConcurrentDictionary<ulong, RpgCharacter> characters = new();
-        private static readonly Dictionary<string, (string Description, int Price)> shopItems = new()
+        private static readonly Dictionary<string, (string Description, int Price, int MinLevel)> shopItems = new()
         {
-            // Potions
-            { "potion", ("Restores 30 HP", 30) },
-            { "elixir", ("Fully restores health", 100) },
-            { "small mana potion", ("Restores 30 Mana", 30) },
-            { "large mana potion", ("Restores 70 Mana", 70) },
+            // Potions (unchanged)
+            { "potion", ("Restores 30 HP", 30, 1) },
+            { "elixir", ("Fully restores health", 100, 25) },
+            { "small mana potion", ("Restores 30 Mana", 30, 1) },
+            { "large mana potion", ("Restores 70 Mana", 70, 15) },
 
-            // Bronze gear
-            { "bronze sword", ("A basic bronze sword.", 125) },
-            { "bronze shield", ("A basic bronze shield. ", 100) },
-            { "bronze helmet", ("A simple bronze helmet.", 75) },
-            { "bronze armor", ("A simple bronze armor. ", 150) },
+            // Bronze gear (unchanged)
+            { "bronze sword", ("A basic bronze sword.", 125, 5) },
+            { "bronze shield", ("A basic bronze shield.", 100, 5) },
+            { "bronze helmet", ("A simple bronze helmet.", 75, 5) },
+            { "bronze armor", ("A simple bronze armor.", 150, 5) },
 
-            // Iron gear
-            { "iron sword", ("A sturdy iron sword. ", 250) },
-            { "iron shield", ("A sturdy iron shield. ", 225) },
-            { "iron helmet", ("A strong iron helmet. ", 200) },
-            { "iron armor", ("Protective iron armor. ", 300) }
+            // Iron gear (tripled)
+            { "iron sword", ("A sturdy iron sword.", 750, 10) },
+            { "iron shield", ("A sturdy iron shield.", 675, 10) },
+            { "iron helmet", ("A strong iron helmet.", 600, 10) },
+            { "iron armor", ("Protective iron armor.", 900, 10) },
+
+            // Steel gear
+            { "steel sword", ("A sharp steel sword.", 900, 15) },
+            { "steel shield", ("A strong steel shield.", 810, 15) },
+            { "steel helmet", ("A steel helmet.", 720, 15) },
+            { "steel armor", ("Protective steel armor.", 1050, 15) },
+
+            // Silver gear
+            { "silver sword", ("A brilliant silver sword.", 1200, 20) },
+            { "silver shield", ("A reflective silver shield.", 1140, 20) },
+            { "silver armor", ("Shiny silver armor.", 1260, 20) },
+
+            // Gold gear
+            { "gold sword", ("A gleaming gold sword.", 1500, 25) },
+            { "gold shield", ("A gleaming gold shield.", 1440, 25) },
+            { "gold helmet", ("A golden helmet.", 1350, 25) },
+            { "gold armor", ("Golden armor.", 1560, 25) },
+
+            // Mithril gear
+            { "mithril sword", ("A lightweight mithril sword.", 1800, 30) },
+            { "mithril shield", ("A strong mithril shield.", 1740, 30) },
+            { "mithril armor", ("Reinforced mithril armor.", 1950, 30) },
+
+            // Adamantite gear
+            { "adamantite sword", ("A nearly unbreakable sword.", 2250, 35) },
+            { "adamantite armor", ("Armor of the gods.", 2400, 35) },
+            { "adamantite shield", ("An indestructible shield.", 2100, 35) },
+
+            // Platinum gear
+            { "platinum sword", ("The finest sword ever forged.", 3000, 40) },
+            { "platinum armor", ("Unmatched platinum armor.", 3300, 40) },
+            { "platinum shield", ("A legendary shield.", 2850, 40) }
         };
+
+
 
 
 
@@ -167,7 +201,7 @@ namespace BBtbChallenger.Modules
         public async Task Fish()
         {
             // Define the cooldown time (e.g., 60 seconds)
-            TimeSpan cooldown = TimeSpan.FromSeconds(20);
+            TimeSpan cooldown = TimeSpan.FromSeconds(5);
 
             // Check if the user has fished recently
             if (LastFishingTime.ContainsKey(Context.User.Id))
@@ -196,7 +230,7 @@ namespace BBtbChallenger.Modules
             int failures = 0;
 
             var startTime = DateTime.UtcNow;
-            var endTime = startTime.AddSeconds(10); // Fishing session lasts 10 seconds
+            var endTime = startTime.AddSeconds(15); // Fishing session lasts 10 seconds
 
             while (DateTime.UtcNow < endTime)
             {
@@ -256,15 +290,30 @@ namespace BBtbChallenger.Modules
         [Command("shop")]
         public async Task ShowShop()
         {
+            if (!characters.TryGetValue(Context.User.Id, out var character))
+            {
+                await ReplyAsync("You don't have a character yet! Create one with `!start`.");
+                return;
+            }
+
+            var playerLevel = character.Level;
             var sb = new StringBuilder();
             sb.AppendLine("🛒 **Welcome to the Item Shop!**");
+            sb.AppendLine($"_(Only items available at your level **{playerLevel}** are shown)_\n");
+
             foreach (var item in shopItems)
             {
-                sb.AppendLine($"**{item.Key}** - {item.Value.Description} | 💰 {item.Value.Price} coins");
+                var (description, price, minLevel) = item.Value;
+                if (playerLevel >= minLevel)
+                {
+                    sb.AppendLine($"**{item.Key}** - {description} | 💰 {price} coins");
+                }
             }
+
             sb.AppendLine("\nType `!buy [item]` to purchase something.");
             await ReplyAsync(sb.ToString());
         }
+
 
         [Command("buy")]
         public async Task BuyItem(params string[] itemNameParts)
@@ -304,7 +353,7 @@ namespace BBtbChallenger.Modules
         }
 
 
-        [Command("inventory")]
+        [Command("bag")]
         public async Task ShowInventory()
         {
             if (!TryLoadCharacter(Context.User.Id, Context.User.Username, out var character))
@@ -338,7 +387,7 @@ namespace BBtbChallenger.Modules
             sb.AppendLine("__**Character Commands:**__");
             sb.AppendLine("`!start` - Begin your adventure / revive.");
             sb.AppendLine("`!stats` - View your character's stats.");
-            sb.AppendLine("`!inventory` - Check your inventory.");
+            sb.AppendLine("`!bag` - Check your inventory.");
             sb.AppendLine("`!equip [sword|shield|armor|helmet]` - Equip your best gear automatically.");
 
             sb.AppendLine();
@@ -365,7 +414,6 @@ namespace BBtbChallenger.Modules
         }
 
 
-
         [Command("sell")]
         public async Task SellItem(params string[] itemNameParts)
         {
@@ -377,29 +425,44 @@ namespace BBtbChallenger.Modules
 
             if (itemNameParts.Length == 0)
             {
-                await ReplyAsync("Please specify an item to sell. Example: `!sell bronze shield`");
+                await ReplyAsync("Please specify an item to sell. Example: `!sell bronze shield 10`");
                 return;
+            }
+
+            int quantity = 1; // Default quantity
+            if (int.TryParse(itemNameParts[^1], out int parsedQuantity)) // Check if last word is a number
+            {
+                quantity = parsedQuantity;
+                itemNameParts = itemNameParts.Take(itemNameParts.Length - 1).ToArray(); // Remove the number from the item name
             }
 
             string itemName = string.Join(" ", itemNameParts).ToLowerInvariant();
 
-            // Check if they have the item
-            var inventoryItem = character.Inventory.FirstOrDefault(i => i.Equals(itemName, StringComparison.OrdinalIgnoreCase));
-            if (inventoryItem == null)
+            // Find all matching items
+            var matchingItems = character.Inventory
+                .Where(i => i.Equals(itemName, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (matchingItems.Count < quantity)
             {
-                await ReplyAsync("You don't have that item in your inventory.");
+                await ReplyAsync($"You don't have {quantity} **{itemName}**(s) to sell.");
                 return;
             }
 
             // Calculate sell price (half of shop price if exists, otherwise a default)
-            int sellPrice = shopItems.TryGetValue(itemName, out var itemInfo) ? itemInfo.Price / 2 : 10;
+            int sellPricePerItem = shopItems.TryGetValue(itemName, out var itemInfo) ? itemInfo.Price / 2 : 10;
+            int totalSellPrice = sellPricePerItem * quantity;
 
-            // Remove the item and add coins
-            character.Inventory.Remove(inventoryItem);
-            character.Coins += sellPrice;
+            // Remove the correct number of items
+            for (int i = 0; i < quantity; i++)
+            {
+                character.Inventory.Remove(matchingItems[i]);
+            }
+
+            character.Coins += totalSellPrice;
 
             SaveManager.SaveCharacter(Context.User.Id, character);
-            await ReplyAsync($"💰 You sold **{itemName}** for **{sellPrice} coins**!");
+            await ReplyAsync($"💰 You sold **{quantity} {itemName}(s)** for **{totalSellPrice} coins**!");
         }
 
 

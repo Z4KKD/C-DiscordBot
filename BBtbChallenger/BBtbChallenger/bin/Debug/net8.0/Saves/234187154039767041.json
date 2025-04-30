@@ -1,0 +1,37 @@
+{
+  "UserId": 234187154039767041,
+  "Name": "stranglemydangle",
+  "Level": 4,
+  "Experience": 73,
+  "Health": 123,
+  "Attack": 23,
+  "Defense": 8,
+  "Mana": 80,
+  "MaxMana": 80,
+  "Coins": 168,
+  "Inventory": [
+    "iron sword",
+    "potion",
+    "potion",
+    "bronze sword",
+    "potion",
+    "potion"
+  ],
+  "Weapon": "iron sword",
+  "Armor": null,
+  "Helmet": null,
+  "Shield": null,
+  "LastDeathTime": "0001-01-01T00:00:00",
+  "WeaponBonus": 10,
+  "ArmorBonus": 0,
+  "HelmetBonus": 0,
+  "ShieldBonus": 0,
+  "IsAlive": true,
+  "MaxHealth": 130,
+  "IsPowerUpActive": false,
+  "FishingLevel": 1,
+  "FishingExperience": 0,
+  "MagicAbilities": [
+    "rock"
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "UserId": 275528839537623040,
+  "Name": "metoyou",
+  "Level": 1,
+  "Experience": 80,
+  "Health": 94,
+  "Attack": 15,
+  "Defense": 5,
+  "Mana": 30,
+  "MaxMana": 50,
+  "Coins": 111,
+  "Inventory": [
+    "bronze sword",
+    "potion"
+  ],
+  "Weapon": "bronze sword",
+  "Armor": null,
+  "Helmet": null,
+  "Shield": null,
+  "LastDeathTime": "0001-01-01T00:00:00",
+  "WeaponBonus": 5,
+  "ArmorBonus": 0,
+  "HelmetBonus": 0,
+  "ShieldBonus": 0,
+  "IsAlive": true,
+  "MaxHealth": 100,
+  "IsPowerUpActive": false,
+  "FishingLevel": 1,
+  "FishingExperience": 0,
+  "MagicAbilities": [
+    "rock"
+  ]
+}

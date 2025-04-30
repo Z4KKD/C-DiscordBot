@@ -10,7 +10,7 @@ public class ArenaManager
     private int _totalExperience;
     private int _totalCoins;
     private int _rewardMultiplier;
-    private int _difficultyScaling; // increases enemy power each round
+    private int _difficultyScaling; 
     private int _enemiesDefeatedInArena;
     private Action<ulong> _removePlayerFromArena;
 
@@ -29,7 +29,7 @@ public class ArenaManager
 
     public async Task<string> StartArena()
     {
-        return await StartOrContinueArena("Welcome to the Arena, {_character.Name}!", false);
+        return await StartOrContinueArena($"Welcome to the Arena, {_character.Name}!", false);
     }
 
     public async Task<string> ContinueArena()
@@ -117,7 +117,7 @@ public class ArenaManager
         var baseEnemy = _enemies[_random.Next(_enemies.Count)];
         var scaledEnemy = baseEnemy.Clone();
 
-        scaledEnemy.MaxHealth += 10 * _difficultyScaling;
+        scaledEnemy.MaxHealth += 5 * _difficultyScaling;
         scaledEnemy.Health = scaledEnemy.MaxHealth;
         scaledEnemy.Attack += 2 * _difficultyScaling;
         scaledEnemy.ExperienceReward += 5;

@@ -1,0 +1,39 @@
+{
+  "UserId": 743900649451946254,
+  "Name": "gekiez",
+  "Level": 4,
+  "Experience": 55,
+  "Health": 130,
+  "Attack": 18,
+  "Defense": 18,
+  "Mana": 80,
+  "MaxMana": 80,
+  "Coins": 300,
+  "Inventory": [
+    "bronze sword",
+    "potion",
+    "potion",
+    "potion",
+    "small mana potion",
+    "bronze shield",
+    "small mana potion",
+    "bronze helmet"
+  ],
+  "Weapon": "bronze sword",
+  "Armor": null,
+  "Helmet": "bronze helmet",
+  "Shield": "bronze shield",
+  "LastDeathTime": "0001-01-01T00:00:00",
+  "WeaponBonus": 5,
+  "ArmorBonus": 0,
+  "HelmetBonus": 5,
+  "ShieldBonus": 5,
+  "IsAlive": true,
+  "MaxHealth": 130,
+  "IsPowerUpActive": false,
+  "FishingLevel": 2,
+  "FishingExperience": 64,
+  "MagicAbilities": [
+    "rock"
+  ]
+}
